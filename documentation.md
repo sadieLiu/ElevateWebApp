@@ -4,7 +4,7 @@ This is a webapp project intended to be a prototype/ starter for a fully functio
 We hope to implement a calendar scheduling system like that of Tutorbird, include sms session reminders, and include scalability for other customizations and features for ElevateEdu.
 
 * Front-end: React, HTML, CSS, Material UI (React Module)
-* Backend: Linode, nextJS, Python (flask api), SQL (database)
+* Backend: Linode (hosting) , nextJS, Python (flask api), SQL (database)
 
 ## Updates
 * Author Initials: 1/24/2016 - Example Problem + Solution Fix
