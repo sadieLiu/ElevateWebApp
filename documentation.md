@@ -6,6 +6,8 @@ We hope to implement a calendar scheduling system like that of Tutorbird, includ
 * Front-end: React, HTML, CSS, Material UI (React Module)
 * Backend: Linode (hosting), nextJS, Python (flask api), SQL (database)
 
+* Marinah Rubalcaba
+
 ## Updates
 * Author Initials: 1/24/2016 - Example Problem + Solution Fix
   * notes example
