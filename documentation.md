@@ -12,3 +12,4 @@ We hope to implement a calendar scheduling system like that of Tutorbird, includ
 * Author Initials: 1/24/2016 - Example Problem + Solution Fix
   * notes example
 
+PRACTICE PULL requests 
