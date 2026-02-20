@@ -3,7 +3,7 @@
 export default function Login(){
 <>
 
-{/* FINISH */ }
+{/* STUFF GOES HERE */ }
 
 </>
 
