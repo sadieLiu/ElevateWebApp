@@ -12,7 +12,5 @@ We hope to implement a calendar scheduling system like that of Tutorbird, includ
   * Marinah Rubalcaba
 
 ## Updates
-* Author Initials: 1/24/2016 - Example Problem + Solution Fix
-  * notes example
-
-PRACTICE PULL requests 
+* Marinah: 2/19/2016 - Created theme file, home page and contact page as well as the key components for these pages (testimonials, contact cards, navbar)
+ 
