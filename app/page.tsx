@@ -1,66 +1,90 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+/* This is the home page of the app */
+
+'use client'; 
+import { Container, Typography, Box, Grid } from '@mui/material';
+import Image from 'next/image';
+import TestimonialSection from './components/Testimonials';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <>
+
+      <Container maxWidth="lg" disableGutters>
+        <Box sx={{ my: 4, textAlign: 'center' }}>
+          <Grid container spacing={4} alignItems="center">
+
+            {/* TEXT SECTION */}
+            <Grid size={{ xs: 12, md: 6 }}>
+
+              <Typography variant="h4" component="h1" fontWeight={'bold'} gutterBottom>
+                Premium tutoring for all
+              </Typography>
+
+              <Typography variant="body1" sx={{
+                maxWidth: '600px', 
+                mx: { xs: 'auto', md: 0 },
+                lineHeight: 1.7, 
+                textAlign: 'justify', color: 'text.secondary'
+              }}>
+                Elevate offers premium, personalized tutoring for K-12 students across all subjects.
+                Our experienced educators are dedicated to unlocking each student's full potential through 
+                tailored learning strategies and one-on-one attention.
+              </Typography>
+
+            </Grid>
+
+            
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  width: '90%',
+                  maxWidth: '1000px',
+                  height: '400px',
+                  mx: 'auto',
+                  mt: 4,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  boxShadow: '0px 10px 30px rgba(0,0,0,0.15)',
+                  border: '1px solid rgba(0,0,0,0.05)'
+                }}
+              >
+                <Image
+                  src="/images/stockimage.jpg"
+                  alt="A student receiving tutoring"
+                  fill
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: 'center 20%'
+                  }}
+                  priority
+                />
+
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    width: '100%',
+                    height: '20%',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)'
+                  }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      </Container>
+
+
+      {/* TESTIMONIAL SECTION */}
+
+      <Box sx={{ background: "#7cb9e8", py: { xs: 5, lg: 5 } }}>
+        <Container maxWidth='lg'>
+          <TestimonialSection />
+        </Container>
+      </Box>
+
+
+    </>
   );
 }
