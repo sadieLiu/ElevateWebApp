@@ -32,8 +32,6 @@ export default function Contact() {
         </Container>
       </Container>
       <ContactSection />
-
-
     </>
   );
 }
