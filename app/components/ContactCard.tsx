@@ -54,7 +54,7 @@ export default function ContactSection() {
                                 '&:hover': { boxShadow: 12, transform: 'translateY(-5px)' } 
                             }}>
                                 <CardContent sx={{ pt: 4 }}>
-                                    <Icon sx={{ fontSize: 40, color: 'teal', mb: 1 }} />
+                                    <Icon sx={{ fontSize: 42, color: 'secondary.dark', mb: 1 }} />
                                     
                                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                                         {item.name}
