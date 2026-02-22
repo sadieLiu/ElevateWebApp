@@ -78,7 +78,7 @@ export default function Home() {
 
       {/* TESTIMONIAL SECTION */}
 
-      <Box sx={{ background: "#7cb9e8", py: { xs: 5, lg: 5 } }}>
+      <Box sx={{ bgcolor: 'secondary.main', py: { xs: 5, lg: 5 } }}>
         <Container maxWidth='lg'>
           <TestimonialSection />
         </Container>
