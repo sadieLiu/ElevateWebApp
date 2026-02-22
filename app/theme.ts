@@ -6,10 +6,14 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
     palette: {
       primary: {
-        main: '#f4f7f6',
+        main: '#f4f7f6', /* our standard white shade */
+      },
+      secondary: {
+        main: '#7cb9e8', /* our standard blue shade */
+        dark: '#3693F7', /* blue shade a bit darker than the one above. for icons */
       },
       background: {
-        default: '#F5F5F5',
+        default: '#F5F5F5', /* less aggresive white shade for our background */
       },
     },
     typography: {
