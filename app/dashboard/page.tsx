@@ -1,35 +1,26 @@
 /* This is the dashboard page for admins, students and tutors */
 
 'use client';
-import { Container, Typography, Box, Grid } from '@mui/material';
+import { Container, Typography, Box, Grid, Paper, Avatar } from '@mui/material';
 
 export default function Dashboard() {
     return (
         <>
             <Container maxWidth="lg" disableGutters>
+
                 <Container maxWidth="lg">
 
-                    <Box
-                        sx={{
-                            mt: 10,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            textAlign: 'center'
-                        }}
-                    >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 6, mt: 4 }}>
 
-                        <Typography variant="h2" component="h1" fontWeight='bold' gutterBottom>
-                            Welcome back!
-                        </Typography>
-
-                        <Typography variant="body1" sx={{ maxWidth: '600px', color: 'text.secondary' }}>
-                           ``
+                        <Typography variant='h4' sx={{ fontWeight: 'bold', color: 'black', mb: '1' }}>
+                            Welcome Back!
                         </Typography>
                     </Box>
+
                 </Container>
+
             </Container>
 
         </>
     );
-        }
+}
