@@ -8,7 +8,7 @@ export default function Login() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // stop default form refresh
-    router.push("/calendar"); // redirect to dashboard
+    router.push("/dashboard"); // redirect to dashboard
   };
 
   return (
