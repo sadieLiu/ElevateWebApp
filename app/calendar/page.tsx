@@ -34,29 +34,41 @@ const localizer = dateFnsLocalizer({
 interface EventType {
   id: number;
   title: string;
+  student: string;
+  tutor: string;
+  notes: string;
   start: Date;
   end: Date;
 }
 
 export default function TutorCalendar() {
   const [events, setEvents] = useState<EventType[]>([
-    {
-      id: 1,
-      title: "Math Tutoring",
-      start: new Date(2026, 1, 17, 10, 0),
-      end: new Date(2026, 1, 17, 11, 0),
-    },
-    {
-      id: 2,
-      title: "Science Tutoring",
-      start: new Date(2026, 1, 18, 11, 0),
-      end: new Date(2026, 1, 18, 12, 0),
-    },
+  {
+  id: 1,
+  title: "Math Tutoring",
+  student: "Test Student",
+  tutor: "Test Tutor",
+  notes: "Sample session",
+  start: new Date(2026, 1, 17, 10, 0),
+  end: new Date(2026, 1, 17, 11, 0),
+},
+  {
+  id: 2,
+  title: "Science Tutoring",
+  student: "Test Student",
+  tutor: "Test Tutor",
+  notes: "Sample session",
+  start: new Date(2026, 1, 18, 11, 0),
+  end: new Date(2026, 1, 18, 12, 0),
+},
   ]);
 
 const [open, setOpen] = useState(false);
 const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
 const [title, setTitle] = useState("");
+const [student, setStudent] = useState("");
+const [tutor, setTutor] = useState("");
+const [notes, setNotes] = useState("");
 
   return (
     <Container maxWidth="lg">
@@ -72,6 +84,7 @@ const [title, setTitle] = useState("");
             startAccessor="start"
             endAccessor="end"
             selectable
+            onSelectEvent={(event) => console.log(event)}
             onSelectSlot={(slotInfo) => {
               setSelectedSlot({
                 start: slotInfo.start,
@@ -96,6 +109,35 @@ const [title, setTitle] = useState("");
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
+
+            <TextField
+  margin="dense"
+  label="Student Name"
+  fullWidth
+  value={student}
+  onChange={(e) => setStudent(e.target.value)}
+/>
+
+          <TextField
+  margin="dense"
+  label="Tutor Name"
+  fullWidth
+  value={tutor}
+  onChange={(e) => setTutor(e.target.value)}
+/>
+
+           <TextField
+  margin="dense"
+  label="Notes"
+  fullWidth
+  multiline
+  rows={3}
+  value={notes}
+  onChange={(e) => setNotes(e.target.value)}
+/>
+
+
+            
           </DialogContent>
 
           <DialogActions>
@@ -104,12 +146,15 @@ const [title, setTitle] = useState("");
               variant="contained"
               onClick={() => {
                 if (selectedSlot && title) {
-                  const newEvent = {
-                    id: events.length + 1,
-                    title,
-                    start: selectedSlot.start,
-                    end: selectedSlot.end,
-                  };
+                 const newEvent = {
+  id: events.length + 1,
+  title,
+  student,
+  tutor,
+  notes,
+  start: selectedSlot.start,
+  end: selectedSlot.end,
+};
 
                   setEvents([...events, newEvent]);
                   setTitle("");
