@@ -3,6 +3,7 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import StyledRoot  from './styledRoot';
 import Navbar from './components/Navbar';
+import { AuthProvider } from './context/AuthContext';
 
 export default function RootLayout({
   children,
@@ -13,10 +14,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
       <AppRouterCacheProvider>
+        <AuthProvider>
         <StyledRoot>
           <Navbar/>
         {children}
         </StyledRoot>
+        </AuthProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
