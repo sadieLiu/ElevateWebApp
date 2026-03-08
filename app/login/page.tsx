@@ -2,14 +2,24 @@
 
 import { Container, Box, Typography, TextField, Button } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // stop default form refresh
-    router.push("/dashboard"); // redirect to dashboard
-  };
+  event.preventDefault();
+
+  login({
+    id: "1",
+    name: "Admin User",
+    email: "admin@test.com",
+    password: "123",
+    role: "admin"
+  });
+  router.push("/dashboard");
+};
 
   return (
     <Container maxWidth="sm">

@@ -18,6 +18,7 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useAuth } from "../context/AuthContext";
 
 const locales = {
   "en-US": enUS,
@@ -41,7 +42,9 @@ interface EventType {
   end: Date;
 }
 
-export default function TutorCalendar() {
+export default function TutorCalendar({ allowScheduling = false }) {
+  
+
   const [events, setEvents] = useState<EventType[]>([
   {
   id: 1,
@@ -83,15 +86,21 @@ const [notes, setNotes] = useState("");
             events={events}
             startAccessor="start"
             endAccessor="end"
-            selectable
+            selectable={allowScheduling}
             onSelectEvent={(event) => console.log(event)}
-            onSelectSlot={(slotInfo) => {
-              setSelectedSlot({
-                start: slotInfo.start,
-                end: slotInfo.end,
-              });
-              setOpen(true);
-            }}
+            
+
+
+         onSelectSlot={(slotInfo) => {
+  if (!allowScheduling) return;
+
+  setSelectedSlot({
+    start: slotInfo.start,
+    end: slotInfo.end,
+  });
+  setOpen(true);
+}}
+
             defaultView="week"
             style={{ height: "100%" }}
           />
