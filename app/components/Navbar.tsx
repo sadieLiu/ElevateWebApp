@@ -49,12 +49,10 @@ const Navbar = () => {
           text: "Students",
           link: "/studentInfo"
         },
-        /* TODO: MAKE TUTOR INFO PAGE
         {
           text: "Tutors",
           link: "/tutorInfo"
         },
-        */
         {
           text: "Logout",
           link: "#"
@@ -70,11 +68,14 @@ const Navbar = () => {
         text: "Calendar",
         link: "/calendar"
       },
-        
-        {
+      {
+        text: "Students",
+        link: "/studentInfo"
+      },
+      {
           text: "Logout",
           link: "#"
-        }
+      }
         
       ];
     } else {
