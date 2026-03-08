@@ -55,7 +55,6 @@ const Navbar = () => {
           link: "/tutorInfo"
         },
         */
-       
         {
           text: "Logout",
           link: "#"
@@ -74,7 +73,7 @@ const Navbar = () => {
         
         {
           text: "Logout",
-          link: "/#"
+          link: "#"
         }
         
       ];
