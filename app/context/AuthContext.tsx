@@ -10,6 +10,7 @@ export interface User {
     id: string;
     role: Role;
     name: string;
+    password: string;
     email: string;
 }
 interface AuthContextType {
