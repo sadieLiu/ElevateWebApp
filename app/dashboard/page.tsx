@@ -16,8 +16,8 @@ export default function Dashboard() {
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 6, mt: 4 }}>
 
-                    <Typography variant='h4' sx={{ fontWeight: 'bold', color: 'black', mb: 1 }}>
-                        Welcome Back, {user?.role}.
+                    <Typography variant='h3' sx={{ fontWeight: 'bold', color: 'black', mb: 1 }}>
+                        Welcome Back, {user?.role}
                     </Typography>
                 </Box>
 
