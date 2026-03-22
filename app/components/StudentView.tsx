@@ -1,7 +1,7 @@
 /* Component to be used for student dashboard */
 import { Typography, Grid, Card, Stack, CardContent, Box } from "@mui/material"
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import BackpackIcon from '@mui/icons-material/Backpack';
+import DescriptionIcon from '@mui/icons-material/Description';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const studentStats = [
@@ -27,7 +27,7 @@ const studentActions = [
     },
     {
         label: "Notes",
-        icon: BackpackIcon,
+        icon: DescriptionIcon,
         info: "View notes from your tutoring sessions"
     }
 ];
