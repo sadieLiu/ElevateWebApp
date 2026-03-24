@@ -35,6 +35,7 @@ const tutorActions = [
 export default function TutorView() {
     return (
         <>
+            {/* Tutor stats section */}
             <Box sx={{ py: 3, px: 2 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Stats
@@ -64,6 +65,8 @@ export default function TutorView() {
 
                 </Grid>
             </Box>
+
+            {/* Quick action for tutor section */}
             <Box sx={{ py: 3, px: 2 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Actions

@@ -21,7 +21,7 @@ export default function Dashboard() {
                     </Typography>
                 </Box>
 
-                {user?.role === 'admin' && <AdminView/>}
+                {user?.role === 'admin' && <AdminView/>} 
                 {user?.role === 'tutor' && <TutorView/>}
                 {user?.role === 'student' && <StudentView/>}
 
