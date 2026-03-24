@@ -41,6 +41,7 @@ const quickActions = [
 export default function AdminView() {
     return (
         <>
+            {/* Admin stats section */}
             <Box sx={{ py: 3, px: 2 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Stats
@@ -70,6 +71,8 @@ export default function AdminView() {
 
                 </Grid>
             </Box>
+
+            {/* Admin quick action section */}
             <Box sx={{ py: 3, px: 2 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Actions
