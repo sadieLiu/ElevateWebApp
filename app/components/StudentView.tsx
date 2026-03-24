@@ -34,6 +34,7 @@ const studentActions = [
 export default function StudentView() {
     return (
         <>
+            {/* Student stats section */}
             <Box sx={{ py: 3, px: 2 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Stats
@@ -63,6 +64,8 @@ export default function StudentView() {
 
                 </Grid>
             </Box>
+
+            {/* Quick action section for student */}
             <Box sx={{ py: 3, px: 2 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Actions
