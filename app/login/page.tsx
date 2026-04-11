@@ -1,25 +1,29 @@
 "use client";
 
-import { Container, Box, Typography, TextField, Button } from "@mui/material";
+import { Container, Box, Typography, TextField, Button, Alert } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+
 
 export default function Login() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
+  const [userName, setUserName] = useState("");
+  const [passwordHash, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  login({
-    id: "1",
-    name: "Admin User",
-    email: "admin@test.com",
-    password: "123",
-    role: "admin"
-  });
-  router.push("/dashboard");
-};
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError("");
+
+    if (await login(userName, passwordHash)) { // if login is successful, redirect to dashboard 
+      router.push("/dashboard");
+    } else {
+      setError("Invalid username or password"); // if login is unsuccessful, show an error message
+    }
+  };
 
   return (
     <Container maxWidth="sm">
@@ -35,6 +39,7 @@ export default function Login() {
           Login
         </Typography>
 
+
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -47,10 +52,12 @@ export default function Login() {
           }}
         >
           <TextField
-            label="Email"
-            type="email"
+            label="Username"
+            type="text"
             fullWidth
             required
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
           />
 
           <TextField
@@ -58,15 +65,20 @@ export default function Login() {
             type="password"
             fullWidth
             required
+            value={passwordHash}
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <Button
-            type="submit"
+            type="submit" 
             variant="contained"
             size="large"
           >
             Login
           </Button>
+          
+          {error && (<Alert severity="error"> {error}</Alert>)} 
+
         </Box>
       </Box>
     </Container>
