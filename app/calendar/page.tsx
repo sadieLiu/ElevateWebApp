@@ -19,6 +19,7 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useAuth } from "../context/AuthContext";
+import { useEffect } from "react";
 
 const locales = {
   "en-US": enUS,
@@ -65,6 +66,17 @@ export default function TutorCalendar({ allowScheduling = false }) {
   end: new Date(2026, 1, 18, 12, 0),
 },
   ]);
+
+useEffect(() => {
+  fetch("http://localhost:5000/sessions")
+    .then((res) => res.json())
+    .then((data) => {
+      setEvents(data);
+    })
+    .catch((err) => console.error(err));
+}, []);
+
+
 
 const [open, setOpen] = useState(false);
 const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);

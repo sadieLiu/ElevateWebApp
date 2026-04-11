@@ -57,6 +57,21 @@ def delete_student(id):
 
         return jsonify({"message": "student deleted"})
 
+@app.route('/api/students/<int:id>', methods=['GET'])
+def get_student_by_id(id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute('SELECT * FROM Student WHERE studentId = %s', (id,))
+    student = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if student:
+        return jsonify(student)
+    return jsonify({"message": "student not found"}), 404        
+
 # LOGIN ROUTE ------------------------
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -130,6 +145,44 @@ def delete_tutor(id):
       conn.close()
 
       return jsonify({"message": "tutor deleted"})
+
+# SESSION ROUTES ------------------------
+
+# get all sessions
+@app.route('/api/sessions', methods=['GET'])
+def get_sessions():
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
+
+      cursor.execute('SELECT * FROM Session')
+      sessions = cursor.fetchall()
+
+      cursor.close()
+      conn.close()
+
+      return jsonify(sessions)
+
+# add session function
+@app.route('/api/sessions', methods=['POST'])
+def add_session():
+      data = request.get_json()
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
+
+      cursor.execute("""
+      INSERT INTO Session (tutorId, subjects, startDateTime, endDateTime, location)
+      VALUES (%s, %s, %s, %s, %s)
+      """,
+      (data['tutorId'], data['subjects'], data['startDateTime'], data['endDateTime'], data['location']))
+
+      conn.commit()
+      session_id = cursor.lastrowid
+
+      cursor.close()
+      conn.close()
+
+      return jsonify({"message": "session added", "sessionId": session_id})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
