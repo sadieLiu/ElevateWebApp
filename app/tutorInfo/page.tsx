@@ -41,10 +41,10 @@ const TutorInfoPage: React.FC = () => {
     return (
         <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
             <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
-                Tutor Directory
+                Tutor Profile Directory
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 5, fontSize: '1.3rem', fontWeight: 500 }}>
-                Manage and view tutor profiles.
+                Manage and view your tutor's profiles.
             </Typography>
 
             <Grid container spacing={4}>
