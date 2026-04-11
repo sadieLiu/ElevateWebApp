@@ -2,36 +2,76 @@
 This allows other pages and components to see who the user is and implement role based access control */
 
 'use client';
-import { ReactNode, createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
-type Role = 'admin' | 'tutor' | 'student'; // temporary
+type Role = 'admin' | 'tutor' | 'student';
 
 export interface User {
-    id: string;
+    userId: number;
+    userName: string;
     role: Role;
-    name: string;
-    password: string;
-    email: string;
+    name: string; // note: this will be null at first
 }
 interface AuthContextType {
     user: User | null;
-    login: (userData: User) => void;
+    login: (userName: string, passwordHash: string) => Promise<boolean>;
     logout: () => void;
+    isLoading: boolean;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const login = (userData: User) => { // note: this will change once backend is setup
-        setUser(userData);
-    }
-    const logout = () => {
-        setUser(null);
+    // this function keeps the user logged in
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+        setIsLoading(false);
+    }, []);
+
+    // this function stores the logged in user so that they stay logged in
+    const login = async (userName: string, passwordHash: string) => {
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userName, passwordHash }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setUser(data);
+                localStorage.setItem('user', JSON.stringify(data));
+                return true;
+            } 
+            else {
+                return false;
+            }
+        } 
+        // if login was unsuccessful, send an error message
+        catch (error) {
+            console.error('Login error:', error);
+            return false;
+        }
     };
 
-    return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem('user');
+    };
+
+    return (
+        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
+
+
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -39,4 +79,4 @@ export const useAuth = () => {
         throw new Error("Error: no AuthProvider found");
     }
     return context;
-}
+};
