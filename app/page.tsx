@@ -4,8 +4,15 @@
 import { Container, Typography, Box, Grid } from '@mui/material';
 import Image from 'next/image';
 import TestimonialSection from './components/Testimonials';
+import { useAuth } from './context/AuthContext';
 
 export default function Home() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Typography variant="h5" align="center" sx={{ mt: 4 }}>Loading Page...</Typography>;
+  }
+
   return (
     <>
 
