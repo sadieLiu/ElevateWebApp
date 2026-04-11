@@ -1,7 +1,8 @@
+/* This page shows information for all tutors in the database */
 'use client';
 import React, { useEffect, useState } from "react";
-import { Container, Box, Grid, Typography, Paper, Divider, CircularProgress } from "@mui/material";
-import TutorInfoCard from "../components/TutorInfoCard"; // Ensure this matches your new filename
+import { Container, Box, Grid, Typography, Paper } from "@mui/material";
+import TutorInfoCard from "../components/TutorInfoCard"; 
 import TutorDropdown from "../components/tutorPicker";
 import { useAuth } from "../context/AuthContext";
 
