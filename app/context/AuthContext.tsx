@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // this function stores the logged in user so that they stay logged in
     const login = async (userName: string, passwordHash: string) => {
         try {
-            const response = await fetch('/api/login', {
+            const response = await fetch('http://127.0.0.1:5000/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userName, passwordHash }),
