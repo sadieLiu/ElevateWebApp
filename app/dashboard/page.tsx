@@ -8,16 +8,20 @@ import StudentView from '../components/StudentView';
 import TutorView from '../components/TutorView';
 
 export default function Dashboard() {
-    const { user } = useAuth();
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <Typography variant="h5" align="center" sx={{ mt: 4 }}>Loading Page...</Typography>;
+    }
 
     return (
         <>
             <Container maxWidth="lg" disableGutters>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 6, mt: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 6, mt: 8 }}>
 
                     <Typography variant='h3' sx={{ fontWeight: 'bold', color: 'black', mb: 1 }}>
-                        Welcome Back, {user?.role}
+                        Welcome Back, {user?.userName} 
                     </Typography>
                 </Box>
 

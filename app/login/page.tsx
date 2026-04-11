@@ -8,11 +8,15 @@ import { useState } from "react";
 
 export default function Login() {
   const router = useRouter();
-  const { login } = useAuth();
-
+  const { login, isLoading } = useAuth();
   const [userName, setUserName] = useState("");
   const [passwordHash, setPassword] = useState("");
   const [error, setError] = useState("");
+
+
+  if (isLoading) {
+    return <Typography variant="h5" align="center" sx={{ mt: 4 }}>Loading Page...</Typography>;
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

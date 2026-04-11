@@ -3,8 +3,15 @@
 'use client';
 import { Container, Typography, Box, Grid } from '@mui/material';
 import ContactSection from "../components/ContactCard";
+import { useAuth } from '../context/AuthContext';
 
 export default function Contact() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <Typography variant="h5" align="center" sx={{ mt: 4 }}>Loading Page...</Typography>;
+  }
+
   return (
     <>
       <Container maxWidth="lg" disableGutters>
