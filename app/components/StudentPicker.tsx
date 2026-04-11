@@ -1,13 +1,14 @@
 import React from "react";
 
 type Student = {
+  studentId: number;
   name: string;
   birthday: string;
   school: string;
-  gradeLevel: string;
+  grade: string;
   location: string;
-parent: string;
-  contact: string;
+  parentName: string;
+  parentEmail: string;
 };
 
 type Props = {
@@ -24,17 +25,17 @@ const StudentDropdown: React.FC<Props> = ({ students, selected, onSelect }) => {
   return (
 
     <select
-      value={selected.name}
+      value={selected?.studentId || ""}
       onChange={(e) => {
-        const student = sorted.find(s => s.name === e.target.value);
+        const student = sorted.find(s => s.studentId === Number(e.target.value));
         if (student) onSelect(student);
       }}
       style={styles.select}
     >
       {sorted.map((s) => (
-        <option key={s.name} value={s.name}>
-          {s.name}
-        </option>
+        <option key={s.studentId} value={s.studentId}>
+  {s.name}
+</option>
       ))}
     </select>
   );

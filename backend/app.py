@@ -154,7 +154,7 @@ def get_sessions():
       conn = get_db_connection()
       cursor = conn.cursor(dictionary=True)
 
-      cursor.execute('SELECT * FROM Session')
+      cursor.execute('SELECT sessionId, subjects, startDateTime, endDateTime FROM Session')
       sessions = cursor.fetchall()
 
       cursor.close()

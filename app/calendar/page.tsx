@@ -68,11 +68,24 @@ export default function TutorCalendar({ allowScheduling = false }) {
   ]);
 
 useEffect(() => {
-  fetch("http://localhost:5000/sessions")
-    .then((res) => res.json())
+  fetch("http://localhost:5000/api/sessions")
+    .then((res) => {
+  console.log(res);
+  return res.json();
+})
     .then((data) => {
-      setEvents(data);
-    })
+      console.log(data);
+  const formattedEvents = data.map((session: any) => ({
+   id: session.sessionId,
+   title: session.subjects,
+   student: "Student",
+   tutor: "Tutor",
+   notes: "",
+   start: new Date(session.startDateTime + " UTC"),
+   end: new Date(session.endDateTime + " UTC"),
+  }));
+  setEvents(formattedEvents);
+})
     .catch((err) => console.error(err));
 }, []);
 

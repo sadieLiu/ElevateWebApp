@@ -1,6 +1,6 @@
 /* This is the student info page */
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "@mui/material/Container";
 import InfoCard from "../components/InfoCard";
 import StudentPicker from "../components/StudentPicker";
@@ -12,25 +12,40 @@ const students = [
 ];
 
 const StudentInfoPage: React.FC = () => {
-  const [selectedStudent, setSelectedStudent] = useState(students[0]);
+  const [selectedStudent, setSelectedStudent] = useState<any>({});
+  const [studentsData, setStudentsData] = useState([]);
+  useEffect(() => {
+  fetch("http://localhost:5000/api/students")
+    .then((res) => res.json())
+    .then((data) => {
+  console.log(data);
+  setStudentsData(data);
+  if (data.length > 0) {
+    setSelectedStudent(data[0]);
+  }
+})
+    .catch((err) => console.error(err));
+}, []);
 
   return (
     <Container maxWidth="sm" style={styles.wrapper}>
       <div>
         <StudentPicker
-            students={students}
+            students={studentsData}
             selected={selectedStudent}
             onSelect={setSelectedStudent}
         />
-        <InfoCard
-          name={selectedStudent.name}
-          birthday={selectedStudent.birthday}
-          school={selectedStudent.school}
-          gradeLevel={selectedStudent.gradeLevel}
-          location={selectedStudent.location}
-          parent={selectedStudent.parent}
-          contact={selectedStudent.contact}
-        />
+        {selectedStudent && (
+  <InfoCard
+    name={selectedStudent.name}
+birthday={selectedStudent.birthday}
+school={selectedStudent.school}
+gradeLevel={selectedStudent.grade}
+location={selectedStudent.location}
+parent={selectedStudent.parentName}
+contact={selectedStudent.parentEmail}
+  />
+)}
       </div>
     </Container>
   );
