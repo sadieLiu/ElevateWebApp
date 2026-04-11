@@ -16,7 +16,7 @@ const StudentInfoPage: React.FC = () => {
 
   return (
     <Container maxWidth="sm" style={styles.wrapper}>
-      <div>``
+      <div>
         <StudentPicker
             students={students}
             selected={selectedStudent}
