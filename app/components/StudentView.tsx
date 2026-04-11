@@ -3,6 +3,7 @@ import { Typography, Grid, Card, Stack, CardContent, Box } from "@mui/material"
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import Link from "next/link";
 
 const studentStats = [
     {
@@ -23,12 +24,14 @@ const studentActions = [
     {
         label: "Schedule",
         icon: CalendarMonthIcon,
-        info: "View your tutoring schedule"
+        info: "View your tutoring schedule",
+        path: "/calendar"
     },
     {
         label: "Notes",
         icon: DescriptionIcon,
-        info: "View notes from your tutoring sessions"
+        info: "View notes from your tutoring sessions",
+        path: "/notes"
     }
 ];
 export default function StudentView() {
@@ -73,25 +76,33 @@ export default function StudentView() {
                 <Grid container spacing={3}>
                     {studentActions.map((action) => (
                         <Grid size={{ xs: 12, md: 4 }} key={action.label}>
-                            <Card sx={{ height: '100%', borderRadius: 3, boxShadow: 4, transition: '0.3s', '&:hover': { boxShadow: 12 } }}>
-                                <CardContent sx={{ pt: 3, color: 'text.primary', display: 'flex', flexDirection: 'column' }}>
-                                    <Stack direction="row" spacing={2} alignItems="center" sx={{ flexGrow: 1 }}>
-                                        <action.icon fontSize="large" sx={{ color: 'secondary.dark' }} />
-                                        <Typography variant="h6" sx={{ mt: 2, fontWeight: 600, color: 'text.primary' }}>
-                                            {action.label}
-                                        </Typography>
-                                    </Stack>
-                                    <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2, flexGrow: 1 }}>
-                                        <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
-                                            {action.info}
-                                        </Typography>
+                            <Link href={action.path} style={{ textDecoration: 'none' }}>
+                                <Card sx={{
+                                    height: '100%', borderRadius: 3, boxShadow: 4, transition: '0.3s', cursor: 'pointer',
+                                    '&:hover': { boxShadow: 12, transform: 'translateY(-4px)' }
+                                }}>
 
-                                        <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
-                                            <ArrowForwardIcon sx={{ color: 'secondary.dark' }} />
-                                        </Box>
-                                    </Stack>
-                                </CardContent>
-                            </Card>
+                                    <CardContent sx={{ pt: 3, color: 'text.primary', display: 'flex', flexDirection: 'column' }}>
+                                        <Stack direction="row" spacing={2} alignItems="center" sx={{ flexGrow: 1 }}>
+                                            <action.icon fontSize="large" sx={{ color: 'secondary.dark' }} />
+                                            <Typography variant="h6" sx={{ mt: 2, fontWeight: 600, color: 'text.primary' }}>
+                                                {action.label}
+                                            </Typography>
+                                        </Stack>
+
+                                        <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2, flexGrow: 1 }}>
+                                            <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+                                                {action.info}
+                                            </Typography>
+
+                                            <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'flex-end' }}>
+                                                <ArrowForwardIcon sx={{ color: 'secondary.dark' }} />
+                                            </Box>
+
+                                        </Stack>
+                                    </CardContent>
+                                </Card>
+                            </Link>
                         </Grid>
 
                     ))}
