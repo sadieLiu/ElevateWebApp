@@ -190,7 +190,21 @@ const [notes, setNotes] = useState("");
   end: selectedSlot.end,
 };
 
-                  setEvents([...events, newEvent]);
+                  fetch("http://localhost:5000/api/sessions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    tutorId: 1,
+    subjects: title,
+    startDateTime: selectedSlot.start.toISOString().slice(0, 19).replace("T", " "),
+endDateTime: selectedSlot.end.toISOString().slice(0, 19).replace("T", " "),
+    location: "online"
+  })
+}).then(() => {
+  setEvents([...events, newEvent]);
+});
                   setTitle("");
                   setSelectedSlot(null);
                   setOpen(false);
