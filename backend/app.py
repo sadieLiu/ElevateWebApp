@@ -28,20 +28,27 @@ def add_student():
         cursor = conn.cursor(dictionary=True)
 
         #create user
-        cursor.execute("""INSERT INTO User (userName, passwordHash, role) VALUES (%s, %s, %s)""", 
-        (data['userName'], data['passwordHash'], 'student'))
+        try:
+                cursor.execute("""INSERT INTO User (userName, passwordHash, role) VALUES (%s, %s, %s)""", 
+                (data['userName'], data['passwordHash'], 'student'))
 
-        user_id = cursor.lastrowid
+                user_id = cursor.lastrowid
 
-        # create a student using the created user above
-        cursor.execute("""INSERT INTO Student (studentId, name, birthday, grade, school, location, parentName, parentPhone, parentEmail) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
-        (user_id, data['name'], data['birthday'], data['grade'], data['school'], data['location'], data['parentName'], data['parentPhone'], data['parentEmail']))
+                # create a student using the created user above
+                cursor.execute("""INSERT INTO Student (studentId, name, birthday, grade, school, location, parentName, parentPhone, parentEmail) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
+                (user_id, data['name'], data['birthday'], data['grade'], data['school'], data['location'], data['parentName'], data['parentPhone'], data['parentEmail']))
+                
+                conn.commit()
+                return jsonify({"message": "student added", "studentId": user_id})
+
+        except Exception as e:
+                conn.rollback()
+                raise e
+
+        finally:
+                cursor.close()
+                conn.close()
         
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        return jsonify({"message": "student added", "studentId": user_id})
 
 # Delete Student Function
 @app.route('/api/students/<int:id>', methods=['DELETE'])
