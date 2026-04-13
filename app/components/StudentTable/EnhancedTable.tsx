@@ -8,10 +8,12 @@ import { EnhancedTableToolbar } from "./EnhancedTableToolbar";
 import { EnhancedTableRows } from "./EnhancedTableRows";
 import { getComparator } from "./tableUtility";
 import { Data, Order } from "./tableTypes";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
-
+import { FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
 
 export default function EnhancedTable() {
+
+const CURRYEAR = new Date().getFullYear();
+
 
 // get data from database for rows
 const [rows, setRows] = React.useState<Data[]>([]);
@@ -19,7 +21,21 @@ const [rows, setRows] = React.useState<Data[]>([]);
 React.useEffect(() => {
   fetch("http://127.0.0.1:5000/api/students")
     .then((res) => res.json())
-    .then((data) => setRows(data));
+    .then((data) => setRows(
+      data.map((student: any) => ({
+        id: student.studentId,
+        userName: student.userName,
+        name: student.name,
+        birthday: student.birthday,
+        grade: student.grade,
+        school: student.school,
+        location: student.location,
+        parentName: student.parentName,
+        parentPhone: student.parentPhone,
+        parentEmail: student.parentEmail,
+    }))
+    )
+  );
 }, []);
 
   const [order, setOrder] = React.useState<Order>("asc");
@@ -34,7 +50,7 @@ React.useEffect(() => {
       [...rows]
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage]
+    [rows, order, orderBy, page, rowsPerPage]
   );
 
   //add student modal
@@ -60,15 +76,8 @@ React.useEffect(() => {
     });
   }
 
-  //toolbar with delete button
-  <EnhancedTableToolbar
-  numSelected={selected.length}
-  onDelete={handleDeleteSelected}
-  onAdd={() => setOpenAddModal(true)}
-/>
-
   // Remove deleted rows from UI
-  setRows(rows.filter((row) => !selected.includes(row.id)));
+  setRows((prevRows) => prevRows.filter((row: Data) => !selected.includes(row.id)));
 
   // Clear selection
   setSelected([]);
@@ -176,7 +185,19 @@ async function handleAddStudent() {
         label="Dense padding"
       />
 
-      <Dialog open={openAddModal} onClose={() => setOpenAddModal(false)}>
+  <Dialog
+    open={openAddModal}
+    onClose={() => setOpenAddModal(false)}
+    sx={{
+      "& .MuiInputBase-input:focus": {
+        color: "#ACDDDE", // or any color you want
+      },
+      "& label.Mui-focused": {
+        color: "#ACDDDE",
+      },
+      
+    }}
+  >
   <DialogTitle>Add Student</DialogTitle>
   <DialogContent>
     <TextField
@@ -208,15 +229,50 @@ async function handleAddStudent() {
       label="Birthday"
       fullWidth
       value={newBirthday}
-      onChange={(e) => setNewBirthday(e.target.value)}
+      placeholder="YYYY-MM-DD"
+      inputProps={{ maxlength: 10 }}
+      onChange={(e) =>  {
+        // Ensure the date is in YYYY-MM-DD format
+        let v = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+
+        //add formatting dashes as user types
+        if (v.length >= 5) v = v.slice(0,4) + "-" + v.slice(4);
+        if (v.length >= 8) v = v.slice(0,7) + "-" + v.slice(7);
+
+        //validates that values are in correct ranges for month and day
+        // if not it sets it to a valid range
+        const [year, month, day] = v.split("-").map(Number);
+        if (year > CURRYEAR) v = CURRYEAR + v.slice(4);
+        if (month > 12) v = v.slice(0,5) + "12" + v.slice(7);
+        if (day > 31) v = v.slice(0,8) + "31";
+
+        setNewBirthday(v)
+        }
+      }
+
     />
-    <TextField
-      margin="dense"
-      label="Grade"
-      fullWidth
-      value={newGrade}
-      onChange={(e) => setNewGrade(e.target.value)}
-    />
+    <FormControl fullWidth margin = "dense">
+      <InputLabel>Grade</InputLabel>
+      <Select
+        value={newGrade}
+        onChange={(e) => setNewGrade(e.target.value)}
+      >
+        <MenuItem value="Kindergarten">Kinder</MenuItem>
+        <MenuItem value="1st Grade">1st Grade</MenuItem>
+        <MenuItem value="2nd Grade">2nd Grade</MenuItem>
+        <MenuItem value="3rd Grade">3rd Grade</MenuItem>
+        <MenuItem value="4th Grade">4th Grade</MenuItem>
+        <MenuItem value="5th Grade">5th Grade</MenuItem>
+        <MenuItem value="6th">6th</MenuItem>
+        <MenuItem value="7th">7th</MenuItem>
+        <MenuItem value="8th">8th</MenuItem>
+        <MenuItem value="9th">9th</MenuItem>
+        <MenuItem value="10th">10th</MenuItem>
+        <MenuItem value="11th">11th</MenuItem>
+        <MenuItem value="12th">12th</MenuItem>
+
+      </Select>
+    </FormControl>
 
     <TextField
       margin="dense"
@@ -225,13 +281,21 @@ async function handleAddStudent() {
       value={newSchool}
       onChange={(e) => setNewSchool(e.target.value)}
     />
-    <TextField
-      margin="dense"
-      label="Location"
-      fullWidth
-      value={newLocation}
-      onChange={(e) => setNewLocation(e.target.value)}
-    />
+
+<FormControl fullWidth margin="dense">
+  <InputLabel>Location</InputLabel>
+  <Select
+    value={newLocation}
+    label="Location"
+    onChange={(e) => setNewLocation(e.target.value)}
+  >
+    <MenuItem value="edu">Edu</MenuItem>
+    <MenuItem value="prep">Prep</MenuItem>
+    <MenuItem value="bridge">Bridge</MenuItem>
+    <MenuItem value="online">Online</MenuItem>
+  </Select>
+</FormControl>
+
     <TextField
       margin="dense"
       label="Parent Name"
@@ -255,7 +319,7 @@ async function handleAddStudent() {
     />
   </DialogContent>
   <DialogActions>
-    <Button onClick={() => setOpenAddModal(false)}>Cancel</Button>
+    <Button variant = 'contained' color = 'primary' onClick={() => setOpenAddModal(false)}>Cancel</Button>
     <Button variant = 'contained' color = 'primary' onClick={handleAddStudent}>Add</Button>
   </DialogActions>
 </Dialog>

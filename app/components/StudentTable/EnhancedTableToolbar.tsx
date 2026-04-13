@@ -36,7 +36,7 @@ export function EnhancedTableToolbar({ numSelected, onDelete, onAdd }: EnhancedT
 
       {numSelected > 0 ? (
         <Tooltip title="Delete Student">
-          <IconButton>
+          <IconButton onClick={onDelete}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>

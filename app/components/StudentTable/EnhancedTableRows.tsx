@@ -10,6 +10,17 @@ interface EnhancedTableRowsProps {
   dense: boolean;
 }
 
+//format birthday
+const formatDate = (dateString: string) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+};
+
 export function EnhancedTableRows({
   rows,
   selected,
@@ -35,18 +46,16 @@ export function EnhancedTableRows({
           >
             <TableCell padding="checkbox">
               <Checkbox
-                color="primary"
+                color="secondary"
                 checked={isItemSelected}
                 inputProps={{ "aria-labelledby": labelId }}
               />
             </TableCell>
 
-            <TableCell component="th" id={labelId} scope="row" padding="none">
-              {row.name}
-            </TableCell>
+            <TableCell component="th" id={labelId} scope="row" padding="none">{row.name} </TableCell>
             <TableCell align="right">{row.grade}</TableCell>
             <TableCell align="right">{row.school}</TableCell>
-            <TableCell align="right">{row.birthday}</TableCell>
+            <TableCell align="right">{formatDate(row.birthday)}</TableCell>
             <TableCell align="right">{row.location}</TableCell>
           </TableRow>
         );

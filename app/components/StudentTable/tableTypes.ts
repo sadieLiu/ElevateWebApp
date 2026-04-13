@@ -5,7 +5,7 @@ export interface Data {
   name: string;
   grade: string;
   school: string;
-  birthday: Date;
+  birthday: string;
   location: string;
 }
 

@@ -3,7 +3,12 @@ from flask_cors import CORS
 from db import get_db_connection
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+CORS(app, supports_credentials=True, 
+     resources={r"/*": {"origins": "*"}},
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     allow_headers=["Content-Type"])
+
 
 # Get all students
 @app.route('/api/students', methods=['GET'])
