@@ -258,11 +258,11 @@ async function handleAddStudent() {
         onChange={(e) => setNewGrade(e.target.value)}
       >
         <MenuItem value="Kindergarten">Kinder</MenuItem>
-        <MenuItem value="1st Grade">1st Grade</MenuItem>
-        <MenuItem value="2nd Grade">2nd Grade</MenuItem>
-        <MenuItem value="3rd Grade">3rd Grade</MenuItem>
-        <MenuItem value="4th Grade">4th Grade</MenuItem>
-        <MenuItem value="5th Grade">5th Grade</MenuItem>
+        <MenuItem value="1st">1st</MenuItem>
+        <MenuItem value="2nd">2nd</MenuItem>
+        <MenuItem value="3rd">3rd</MenuItem>
+        <MenuItem value="4th">4th</MenuItem>
+        <MenuItem value="5th">5th</MenuItem>
         <MenuItem value="6th">6th</MenuItem>
         <MenuItem value="7th">7th</MenuItem>
         <MenuItem value="8th">8th</MenuItem>
