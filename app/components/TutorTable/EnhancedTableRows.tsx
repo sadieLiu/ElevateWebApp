@@ -1,0 +1,64 @@
+//Rows
+
+import { TableRow,TableCell,Checkbox } from "@mui/material";
+import Data from "./tableTypes";
+
+interface EnhancedTableRowsProps {
+  rows: Data[];
+  selected: readonly number[];
+  onRowClick: (event: React.MouseEvent<unknown>, id: number) => void;
+  dense: boolean;
+}
+
+//format birthday
+const formatDate = (dateString: string) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+};
+
+export function EnhancedTableRows({
+  rows,
+  selected,
+  onRowClick,
+  dense
+}: EnhancedTableRowsProps) {
+  return (
+    <>
+      {rows.map((row, index) => {
+        const isItemSelected = selected.includes(row.id);
+        const labelId = `enhanced-table-checkbox-${index}`;
+
+        return (
+          <TableRow
+            hover
+            onClick={(event) => onRowClick(event, row.id)}
+            role="checkbox"
+            aria-checked={isItemSelected}
+            tabIndex={-1}
+            key={row.id}
+            selected={isItemSelected}
+            sx={{ cursor: "pointer" }}
+          >
+            <TableCell padding="checkbox">
+              <Checkbox
+                color="secondary"
+                checked={isItemSelected}
+                inputProps={{ "aria-labelledby": labelId }}
+              />
+            </TableCell>
+
+            <TableCell component="th" id={labelId} scope="row" padding="none">{row.name} </TableCell>
+            <TableCell align="right">{row.subjects}</TableCell>
+            <TableCell align="right">{row.availibility}</TableCell>
+            <TableCell align="right">{formatDate(row.birthday)}</TableCell>
+          </TableRow>
+        );
+      })}
+    </>
+  );
+}
