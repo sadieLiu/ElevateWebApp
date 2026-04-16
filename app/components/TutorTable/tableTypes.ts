@@ -4,7 +4,7 @@ export interface Data {
   id: number;
   name: string;
   subjects: string;
-  availibility: string;
+  availability: string;
   birthday: string;
 }
 

@@ -28,7 +28,7 @@ React.useEffect(() => {
         name: tutor.name,
         birthday: tutor.birthday,
         subjects: tutor.subjects,
-        availibility: tutor.availibility
+        availability: tutor.availability
     }))
     )
   );
@@ -57,7 +57,7 @@ React.useEffect(() => {
   const [newName, setNewName] = React.useState("")
   const [newBirthday, setNewBirthday] = React.useState("")
   const [newSubjects, setNewSubjects] = React.useState("")
-  const [newAvailibility, setNewAvailibility] = React.useState("")
+  const [newAvailability, setNewAvailability] = React.useState("")
 
   //delete functionality
   async function handleDeleteSelected() {
@@ -76,7 +76,7 @@ React.useEffect(() => {
 
 // add  functionality
 async function handleAddTutor() {
-  await fetch("http://127.0.0.1:5000/api/s", {
+  await fetch("http://127.0.0.1:5000/api/tutors", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -85,7 +85,7 @@ async function handleAddTutor() {
       name: newName,
       birthday: newBirthday,
       subjects: newSubjects,
-      availibility: newAvailibility,
+      availability: newAvailability,
     }),
   });
 
@@ -101,8 +101,7 @@ async function handleAddTutor() {
   setNewName("");
   setNewBirthday("");
   setNewSubjects("");
-  setNewAvailibility("");
-
+  setNewAvailability("");
 }
 
   return (
@@ -214,7 +213,7 @@ async function handleAddTutor() {
       fullWidth
       value={newBirthday}
       placeholder="YYYY-MM-DD"
-      inputProps={{ maxlength: 10 }}
+      inputProps={{ maxLength: 10 }}
       onChange={(e) =>  {
         // Ensure the date is in YYYY-MM-DD format
         let v = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
@@ -245,10 +244,10 @@ async function handleAddTutor() {
 
     <TextField
       margin="dense"
-      label="Availibility"
+      label="Availability"
       fullWidth
-      value={newAvailibility}
-      onChange={(e) => setNewAvailibility(e.target.value)}
+      value={newAvailability}
+      onChange={(e) => setNewAvailability(e.target.value)}
     />
   </DialogContent>
   <DialogActions>

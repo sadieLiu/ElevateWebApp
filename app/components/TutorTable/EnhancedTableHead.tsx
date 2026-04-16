@@ -25,10 +25,10 @@ const headCells: readonly HeadCell[] = [
     label: 'Subjects',
   },
   {
-    id: 'availibility',
+    id: 'availability',
     numeric: true,
     disablePadding: false,
-    label: 'Availibility',
+    label: 'Availability',
   },
   {
     id: 'birthday',

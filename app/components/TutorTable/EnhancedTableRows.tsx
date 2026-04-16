@@ -54,7 +54,7 @@ export function EnhancedTableRows({
 
             <TableCell component="th" id={labelId} scope="row" padding="none">{row.name} </TableCell>
             <TableCell align="right">{row.subjects}</TableCell>
-            <TableCell align="right">{row.availibility}</TableCell>
+            <TableCell align="right">{row.availability}</TableCell>
             <TableCell align="right">{formatDate(row.birthday)}</TableCell>
           </TableRow>
         );

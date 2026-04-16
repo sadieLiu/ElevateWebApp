@@ -9,7 +9,6 @@ CORS(app, supports_credentials=True,
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
      allow_headers=["Content-Type"])
 
-
 # Get all students
 @app.route('/api/students', methods=['GET'])
 def get_students():
@@ -27,32 +26,32 @@ def get_students():
 # Add Student Function 
 @app.route ('/api/students', methods=['POST'])
 def add_student():
-        data = request.get_json()
+      data = request.get_json()
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
 
-        #create user
-        try:
-                cursor.execute("""INSERT INTO User (userName, passwordHash, role) VALUES (%s, %s, %s)""", 
-                (data['userName'], data['passwordHash'], 'student'))
+      #create user
+      try:
+            cursor.execute("""INSERT INTO User (userName, passwordHash, role) VALUES (%s, %s, %s)""", 
+            (data['userName'], data['passwordHash'], 'student'))
 
-                user_id = cursor.lastrowid
+            user_id = cursor.lastrowid
 
-                # create a student using the created user above
-                cursor.execute("""INSERT INTO Student (studentId, name, birthday, grade, school, location, parentName, parentPhone, parentEmail) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
-                (user_id, data['name'], data['birthday'], data['grade'], data['school'], data['location'], data['parentName'], data['parentPhone'], data['parentEmail']))
+            # create a student using the created user above
+            cursor.execute("""INSERT INTO Student (studentId, name, birthday, grade, school, location, parentName, parentPhone, parentEmail) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
+            (user_id, data['name'], data['birthday'], data['grade'], data['school'], data['location'], data['parentName'], data['parentPhone'], data['parentEmail']))
                 
-                conn.commit()
-                return jsonify({"message": "student added", "studentId": user_id})
+            conn.commit()
+            return jsonify({"message": "student added", "studentId": user_id})
 
-        except Exception as e:
-                conn.rollback()
-                raise e
+      except Exception as e:
+            conn.rollback()
+            raise e
 
-        finally:
-                cursor.close()
-                conn.close()
+      finally:
+            cursor.close()
+            conn.close()
         
 
 # Delete Student Function
@@ -113,7 +112,7 @@ def get_tutors():
       
       cursor.execute('SELECT * FROM Tutor')
       tutors = cursor.fetchall()
-      
+
       cursor.close()
       conn.close()
       
@@ -125,23 +124,28 @@ def add_tutor():
       data = request.get_json()
       conn = get_db_connection()
       cursor = conn.cursor(dictionary=True)
+      try:
+            # create user
+            cursor.execute("""INSERT INTO User (userName, passwordHash, role) VALUES (%s, %s, %s)""", 
+            (data['userName'], data['passwordHash'], 'tutor'))
 
-      # create user
-      cursor.execute("""INSERT INTO User (userName, passwordHash, role) VALUES (%s, %s, %s)""", 
-      (data['userName'], data['passwordHash'], 'tutor'))
+            user_id = cursor.lastrowid
 
-      user_id = cursor.lastrowid
+            # create a tutor 
+            cursor.execute("""INSERT INTO Tutor (tutorId, name, isAdmin, birthday, subjects, availability) VALUES (%s, %s, %s, %s, %s, %s)""", 
+            (user_id, data['name'], data.get('isAdmin', False), data['birthday'], data['subjects'], data['availability']))
+                  
 
-      # create a tutor 
-      cursor.execute("""INSERT INTO Tutor (tutorId, name, isAdmin, birthday, subjects, availability) VALUES (%s, %s, %s, %s, %s, %s)""", 
-      (user_id, data['name'], data.get('isAdmin', False), data['birthday'], data['subjects'], data['availability']))
-      
+            conn.commit()
+            return jsonify({"message": "tutor added", "tutorId": user_id})
 
-      conn.commit()
-      cursor.close()
-      conn.close()
-      
-      return jsonify({"message": "tutor added", "tutorId": user_id})
+      except Exception as e:
+            conn.rollback()
+            raise e
+
+      finally:
+            cursor.close()
+            conn.close()
 
 # delete tutor function
 @app.route('/api/tutors/<int:id>', methods=['DELETE'])
