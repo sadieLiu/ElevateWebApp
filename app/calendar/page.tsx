@@ -68,7 +68,7 @@ export default function TutorCalendar({ allowScheduling = false }) {
   ]);
 
 useEffect(() => {
-  fetch("http://localhost:5000/api/sessions")
+  fetch("http://127.0.0.1:5000/api/sessions")
     .then((res) => {
   console.log(res);
   return res.json();
@@ -190,7 +190,7 @@ const [notes, setNotes] = useState("");
   end: selectedSlot.end,
 };
 
-                  fetch("http://localhost:5000/api/sessions", {
+                  fetch("http://127.0.0.1:5000/api/sessions", {
   method: "POST",
   headers: {
     "Content-Type": "application/json"
