@@ -200,6 +200,87 @@ def add_session():
 
       return jsonify({"message": "session added", "sessionId": session_id})
 
+# DASHBOARD STATS ROUTE ------------------------
+@app.route('/api/dashboard-stats/<int:userId>/<string:role>')
+def get_dashboard_stats(userId, role):
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
+      stats = {}
+      
+      try:
+            if role == 'admin':
+                  # get total students
+                  cursor.execute('SELECT COUNT(*) AS total FROM Student')
+                  stats['totalStudents'] = cursor.fetchone()['total']
+
+                  # get total tutors
+                  cursor.execute('SELECT COUNT(*) AS total FROM Tutor')
+                  stats['totalTutors'] = cursor.fetchone()['total']
+
+                  # get total sessions
+                  cursor.execute('SELECT COUNT(*) AS total FROM Session')
+                  stats['totalSessions'] = cursor.fetchone()['total']
+
+                  # get 5 upcoming sessions with all info
+                  cursor.execute("""SELECT s.sessionId, s.subjects, s.startDateTime, s.endDateTime, s.location, 
+                  t.name AS tutorName, st.name AS studentName FROM Session s 
+                  LEFT JOIN Tutor t ON s.tutorId = t.tutorId 
+                  LEFT JOIN SessionReport sr ON s.sessionId = sr.sessionId 
+                  LEFT JOIN Student st ON sr.studentId = st.studentId 
+                  WHERE s.startDateTime > NOW() ORDER BY s.startDateTime ASC LIMIT 5""")
+                  stats['upcomingSessions'] = cursor.fetchall()
+            
+            elif role == 'tutor':
+            
+                  # get total sessions for tutor
+                  cursor.execute('SELECT COUNT(*) AS total FROM Session WHERE tutorId = %s', (userId,))
+                  stats['totalSessions'] = cursor.fetchone()['total']
+
+                  # find upcoming sessions for tutor
+                  cursor.execute("""SELECT s.sessionId, s.subjects, s.startDateTime, s.endDateTime, s.location, 
+                  st.name AS studentName FROM Session s 
+                  LEFT JOIN SessionReport sr ON s.sessionId = sr.sessionId 
+                  LEFT JOIN Student st ON sr.studentId = st.studentId WHERE s.tutorId = %s AND 
+                  s.startDateTime > NOW() ORDER BY s.startDateTime ASC LIMIT 5""", (userId,))
+                  stats['upcomingSessions'] = cursor.fetchall()
+
+                  # get the total number of students the tutor is currently tutoring
+                  cursor.execute("""SELECT COUNT(DISTINCT studentId) AS total FROM SessionReport sr JOIN Session s ON 
+                  sr.sessionId = s.sessionId WHERE s.tutorId = %s""", (userId,))
+                  stats['totalStudents'] = cursor.fetchone()['total']
+            
+            elif role == 'student':
+                  # get total sessions for student
+                  cursor.execute('SELECT COUNT(*) AS total FROM SessionReport WHERE studentId = %s', (userId,))
+                  stats['totalSessions'] = cursor.fetchone()['total']
+
+                  # find upcoming sessions for student
+                  cursor.execute("""SELECT s.sessionId, s.subjects, s.startDateTime, s.endDateTime, s.location, 
+                  t.name AS tutorName FROM Session s 
+                  JOIN SessionReport sr ON s.sessionId = sr.sessionId 
+                  JOIN Tutor t ON s.tutorId = t.tutorId WHERE sr.studentId = %s AND s.startDateTime > NOW() 
+                  ORDER BY s.startDateTime ASC LIMIT 5""", (userId,))
+                  stats['upcomingSessions'] = cursor.fetchall()
+
+                  # get the number of subjects the student is being tutored in
+                  cursor.execute("""SELECT COUNT(DISTINCT subjects) AS total FROM Session s JOIN 
+                  SessionReport ss ON s.sessionId = ss.sessionId WHERE ss.studentId = %s""", (userId,))
+                  stats['totalSubjects'] = cursor.fetchone()['total']
+
+                  # get the grade level of the student
+                  cursor.execute('SELECT grade FROM Student WHERE studentId = %s', (userId,))
+                  stats['grade'] = cursor.fetchone()['grade']
+
+
+            return jsonify(stats)
+
+      except Exception as e:
+            raise e
+      
+      finally:
+            cursor.close()
+            conn.close()
+      
 
 if __name__ == '__main__':
     app.run(debug=True)
