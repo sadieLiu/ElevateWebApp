@@ -1,7 +1,7 @@
 //main table component combing all subcomponents
 "use client";
 
-import { Box, Paper, Table, TableBody, TableContainer, TablePagination, FormControlLabel, Switch } from "@mui/material";
+import { Box, Paper, Table, TableBody, TableContainer, TablePagination, FormControlLabel, Switch, Checkbox, FormGroup } from "@mui/material";
 import * as React from 'react';
 import { EnhancedTableHead } from "./EnhancedTableHead";
 import { EnhancedTableToolbar } from "./EnhancedTableToolbar";
@@ -14,6 +14,7 @@ export default function EnhancedTable() {
 
 const CURRYEAR = new Date().getFullYear();
 
+const [selectedSubjects, setSelectedSubjects] = React.useState<string[]>([]);
 
 // get data from database for rows
 const [rows, setRows] = React.useState<Data[]>([]);
@@ -32,7 +33,19 @@ React.useEffect(() => {
     }))
     )
   );
+  
 }, []);
+
+//tutor subjects funtionality
+const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const subject = event.target.name;
+
+  setSelectedSubjects(prev =>
+    event.target.checked
+      ? [...prev, subject]                 // add subject
+      : prev.filter(s => s !== subject)    // remove subject
+  );
+};
 
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("name");
@@ -76,6 +89,7 @@ React.useEffect(() => {
 
 // add  functionality
 async function handleAddTutor() {
+  const subjectString = selectedSubjects.join (", "); //concat subjects into a single string
   await fetch("http://127.0.0.1:5000/api/tutors", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -84,7 +98,7 @@ async function handleAddTutor() {
       passwordHash: newPasswordHash,
       name: newName,
       birthday: newBirthday,
-      subjects: newSubjects,
+      subjects: subjectString,
       availability: newAvailability,
     }),
   });
@@ -100,7 +114,7 @@ async function handleAddTutor() {
   setNewPasswordHash("");
   setNewName("");
   setNewBirthday("");
-  setNewSubjects("");
+  setSelectedSubjects([]);
   setNewAvailability("");
 }
 
@@ -234,13 +248,41 @@ async function handleAddTutor() {
       }
 
     />
-    <TextField
-      margin="dense"
-      label="Subjects"
-      fullWidth
-      value={newSubjects}
-      onChange={(e) => setNewSubjects(e.target.value)}
-    />
+
+    <FormControl fullWidth margin="dense">
+        <FormControlLabel 
+          control={
+            <Checkbox name="Math" 
+            checked={selectedSubjects.includes("Math")} 
+            onChange={handleSubjectChange} 
+            />
+          } label="Math"
+        />
+        <FormControlLabel 
+          control={
+            <Checkbox name="English" 
+            checked={selectedSubjects.includes("English")} 
+            onChange={handleSubjectChange} 
+            />
+          } label="English"
+        />
+        <FormControlLabel 
+          control={
+            <Checkbox name="Science" 
+            checked={selectedSubjects.includes("Science")} 
+            onChange={handleSubjectChange} 
+            />
+          } label="Science"
+        />
+        <FormControlLabel 
+          control={
+            <Checkbox name="History" 
+            checked={selectedSubjects.includes("History")} 
+            onChange={handleSubjectChange} 
+            />
+          } label="History"
+        />
+    </FormControl>
 
     <TextField
       margin="dense"
