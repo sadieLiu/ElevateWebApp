@@ -173,7 +173,20 @@ export default function TutorCalendar({ allowScheduling = false }) {
 
           <DialogActions>
   <Button onClick={() => setOpen(false)}>Cancel</Button>
-
+{isEditing && selectedEvent && (
+    <Button
+      color="error"
+      onClick={() => {
+        fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
+          method: "DELETE",
+        }).then(() => {
+          window.location.reload();
+        });
+      }}
+    >
+      Delete
+    </Button>
+  )}
   <Button
     variant="contained"
     onClick={() => {

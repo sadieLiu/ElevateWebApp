@@ -226,6 +226,22 @@ def update_session(id):
 
       return jsonify({"message": "session updated"})
 
+ # delete session function      
+@app.route('/api/sessions/<int:id>', methods=['DELETE'])
+def delete_session(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute('DELETE FROM SessionReport WHERE sessionId = %s', (id,))
+    cursor.execute('DELETE FROM Session WHERE sessionId = %s', (id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "session deleted"})
+
+
 # DASHBOARD STATS ROUTE ------------------------
 @app.route('/api/dashboard-stats/<int:userId>/<string:role>')
 def get_dashboard_stats(userId, role):
