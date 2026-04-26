@@ -165,6 +165,8 @@ def delete_tutor(id):
 
 # SESSION ROUTES ------------------------
 
+# SESSION ROUTES ------------------------
+
 # get all sessions
 @app.route('/api/sessions', methods=['GET'])
 def get_sessions():
@@ -199,6 +201,30 @@ def add_session():
       conn.close()
 
       return jsonify({"message": "session added", "sessionId": session_id})
+
+# update session function
+@app.route('/api/sessions/<int:id>', methods=['PUT'])
+def update_session(id):
+      data = request.get_json()
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
+
+      cursor.execute("""
+      UPDATE Session
+      SET subjects = %s,
+          startDateTime = %s,
+          endDateTime = %s,
+          location = %s
+      WHERE sessionId = %s
+      """,
+      (data['subjects'], data['startDateTime'], data['endDateTime'], data['location'], id))
+
+      conn.commit()
+
+      cursor.close()
+      conn.close()
+
+      return jsonify({"message": "session updated"})
 
 # DASHBOARD STATS ROUTE ------------------------
 @app.route('/api/dashboard-stats/<int:userId>/<string:role>')
