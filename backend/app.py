@@ -188,6 +188,23 @@ def add_session():
       conn = get_db_connection()
       cursor = conn.cursor(dictionary=True)
 
+      # check overlap
+      cursor.execute("""
+      SELECT * FROM Session
+      WHERE tutorId = %s
+      AND startDateTime < %s
+      AND endDateTime > %s
+      """,
+      (data['tutorId'], data['endDateTime'], data['startDateTime']))
+
+      overlap = cursor.fetchone()
+
+      if overlap:
+            cursor.close()
+            conn.close()
+            return jsonify({"message": "Tutor already has a session during this time"}), 409
+
+      # insert session (ONLY if no overlap)
       cursor.execute("""
       INSERT INTO Session (tutorId, subjects, startDateTime, endDateTime, location)
       VALUES (%s, %s, %s, %s, %s)
@@ -201,7 +218,6 @@ def add_session():
       conn.close()
 
       return jsonify({"message": "session added", "sessionId": session_id})
-
 # update session function
 @app.route('/api/sessions/<int:id>', methods=['PUT'])
 def update_session(id):

@@ -135,6 +135,19 @@ export default function TutorCalendar({ allowScheduling = false }) {
           </DialogTitle>
 
           <DialogContent>
+
+{selectedSlot && (
+  <Box sx={{ mb: 2 }}>
+    <Typography variant="body2">
+      Start: {selectedSlot.start.toLocaleString()}
+    </Typography>
+    <Typography variant="body2">
+      End: {selectedSlot.end.toLocaleString()}
+    </Typography>
+  </Box>
+)}
+
+
             <TextField
               autoFocus
               margin="dense"
@@ -204,9 +217,14 @@ export default function TutorCalendar({ allowScheduling = false }) {
             endDateTime: selectedSlot.end.toISOString().slice(0, 19).replace("T", " "),
             location: "online",
           }),
-        }).then(() => {
-          window.location.reload();
-        });
+        }).then((res) => {
+  if (!res.ok) {
+    return res.json().then((data) => {
+      alert(data.message);
+    });
+  }
+  window.location.reload();
+});
       } else {
         fetch("http://127.0.0.1:5000/api/sessions", {
           method: "POST",
@@ -220,9 +238,14 @@ export default function TutorCalendar({ allowScheduling = false }) {
             endDateTime: selectedSlot.end.toISOString().slice(0, 19).replace("T", " "),
             location: "online",
           }),
-        }).then(() => {
-          window.location.reload();
-        });
+        }).then((res) => {
+  if (!res.ok) {
+    return res.json().then((data) => {
+      alert(data.message);
+    });
+  }
+  window.location.reload();
+});
       }
 
       setTitle("");
