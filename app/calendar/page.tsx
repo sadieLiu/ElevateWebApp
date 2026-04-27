@@ -12,6 +12,10 @@ import {
   DialogActions,
   TextField,
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
 } from "@mui/material";
 
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
@@ -35,8 +39,8 @@ const localizer = dateFnsLocalizer({
 interface EventType {
   id: number;
   title: string;
-  student: string;
-  tutor: string;
+  student: number | "";
+tutor: number | "";
   notes: string;
   start: Date;
   end: Date;
@@ -47,8 +51,8 @@ export default function TutorCalendar({ allowScheduling = false }) {
     {
       id: 1,
       title: "Math Tutoring",
-      student: "Test Student",
-      tutor: "Test Tutor",
+      student: "",
+tutor: "",
       notes: "Sample session",
       start: new Date(2026, 1, 17, 10, 0),
       end: new Date(2026, 1, 17, 11, 0),
@@ -56,23 +60,26 @@ export default function TutorCalendar({ allowScheduling = false }) {
     {
       id: 2,
       title: "Science Tutoring",
-      student: "Test Student",
-      tutor: "Test Tutor",
+      student: "",
+tutor: "",
       notes: "Sample session",
       start: new Date(2026, 1, 18, 11, 0),
       end: new Date(2026, 1, 18, 12, 0),
     },
   ]);
 
+const [students, setStudents] = useState<any[]>([]);
+  const [tutors, setTutors] = useState<any[]>([]);
+
   useEffect(() => {
     fetch("http://127.0.0.1:5000/api/sessions")
       .then((res) => res.json())
       .then((data) => {
         const formattedEvents = data.map((session: any) => ({
-          id: session.sessionId,
-          title: session.subjects,
-          student: "Student",
-          tutor: "Tutor",
+  id: session.sessionId,
+  title: session.subjects,
+  student: "",
+  tutor: session.tutorId,
           notes: "",
           start: new Date(session.startDateTime + " UTC"),
           end: new Date(session.endDateTime + " UTC"),
@@ -82,14 +89,27 @@ export default function TutorCalendar({ allowScheduling = false }) {
       .catch((err) => console.error(err));
   }, []);
 
+  useEffect(() => {
+  fetch("http://127.0.0.1:5000/api/students")
+    .then((res) => res.json())
+    .then((data) => setStudents(data))
+    .catch((err) => console.error(err));
+
+  fetch("http://127.0.0.1:5000/api/tutors")
+    .then((res) => res.json())
+    .then((data) => setTutors(data))
+    .catch((err) => console.error(err));
+}, []);
+
   const [open, setOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
   const [title, setTitle] = useState("");
-  const [student, setStudent] = useState("");
-  const [tutor, setTutor] = useState("");
+  const [student, setStudent] = useState<number | "">("");
+  const [tutor, setTutor] = useState<number | "">("");
   const [notes, setNotes] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  
 
   return (
     <Container maxWidth="lg">
@@ -157,21 +177,35 @@ export default function TutorCalendar({ allowScheduling = false }) {
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            <TextField
-              margin="dense"
-              label="Student Name"
-              fullWidth
-              value={student}
-              onChange={(e) => setStudent(e.target.value)}
-            />
+            <FormControl fullWidth margin="dense">
+  <InputLabel>Student</InputLabel>
+  <Select
+    value={student}
+    label="Student"
+    onChange={(e) => setStudent(Number(e.target.value))}
+  >
+    {students.map((s: any) => (
+      <MenuItem key={s.studentId} value={s.studentId}>
+        {s.name}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
 
-            <TextField
-              margin="dense"
-              label="Tutor Name"
-              fullWidth
-              value={tutor}
-              onChange={(e) => setTutor(e.target.value)}
-            />
+            <FormControl fullWidth margin="dense">
+  <InputLabel>Tutor</InputLabel>
+  <Select
+    value={tutor}
+    label="Tutor"
+    onChange={(e) => setTutor(Number(e.target.value))}
+  >
+    {tutors.map((t: any) => (
+      <MenuItem key={t.tutorId} value={t.tutorId}>
+        {t.name}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
 
             <TextField
               margin="dense"
@@ -232,8 +266,9 @@ export default function TutorCalendar({ allowScheduling = false }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            tutorId: 1,
-            subjects: title,
+  tutorId: tutor,
+  studentId: student,
+  subjects: title,
             startDateTime: selectedSlot.start.toISOString().slice(0, 19).replace("T", " "),
             endDateTime: selectedSlot.end.toISOString().slice(0, 19).replace("T", " "),
             location: "online",

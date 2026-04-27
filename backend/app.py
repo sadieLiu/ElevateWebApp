@@ -173,7 +173,7 @@ def get_sessions():
       conn = get_db_connection()
       cursor = conn.cursor(dictionary=True)
 
-      cursor.execute('SELECT sessionId, subjects, startDateTime, endDateTime FROM Session')
+      cursor.execute('SELECT sessionId, tutorId, subjects, startDateTime, endDateTime FROM Session')
       sessions = cursor.fetchall()
 
       cursor.close()
@@ -214,10 +214,19 @@ def add_session():
       conn.commit()
       session_id = cursor.lastrowid
 
+      if data.get('studentId'):
+         cursor.execute("""
+         INSERT INTO SessionReport (sessionId, studentId)
+         VALUES (%s, %s)
+         """, (session_id, data['studentId']))
+
+         conn.commit()
+
       cursor.close()
       conn.close()
 
       return jsonify({"message": "session added", "sessionId": session_id})
+
 # update session function
 @app.route('/api/sessions/<int:id>', methods=['PUT'])
 def update_session(id):
@@ -225,15 +234,33 @@ def update_session(id):
       conn = get_db_connection()
       cursor = conn.cursor(dictionary=True)
 
+      # check overlap, but ignore the session being edited
+      cursor.execute("""
+      SELECT * FROM Session
+      WHERE tutorId = %s
+      AND sessionId != %s
+      AND startDateTime < %s
+      AND endDateTime > %s
+      """,
+      (data['tutorId'], id, data['endDateTime'], data['startDateTime']))
+
+      overlap = cursor.fetchone()
+
+      if overlap:
+            cursor.close()
+            conn.close()
+            return jsonify({"message": "Tutor already has a session during this time"}), 409
+
       cursor.execute("""
       UPDATE Session
-      SET subjects = %s,
+      SET tutorId = %s,
+          subjects = %s,
           startDateTime = %s,
           endDateTime = %s,
           location = %s
       WHERE sessionId = %s
       """,
-      (data['subjects'], data['startDateTime'], data['endDateTime'], data['location'], id))
+      (data['tutorId'], data['subjects'], data['startDateTime'], data['endDateTime'], data['location'], id))
 
       conn.commit()
 
