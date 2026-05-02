@@ -108,22 +108,22 @@ const handleClick = (text: string) => {
 
   return (
     <>
-      <AppBar position="static" color="primary" sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Container>
+      <AppBar position="static" sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'secondary.main' }}>
+        <Container maxWidth="xl" disableGutters>
           <Toolbar>
-            <SchoolIcon />
-            <Typography variant="h6" fontWeight={'bold'} sx={{ flexGrow: 1 }} >
+            <SchoolIcon sx={{color: 'primary.main'}}/>
+            <Typography variant="h5" fontWeight={'bold'} sx={{ flexGrow: 1, color: 'primary.main' }} >
               ElevateEdu
             </Typography>
 
-            {isMobile && (<IconButton color='inherit' onClick={toggleDrawer(true)}>
+            {isMobile && (<IconButton sx={{color: 'primary.main'}} onClick={toggleDrawer(true)}>
               <MenuIcon />
             </IconButton>)}
 
             {!isMobile && links.map((link, index) =>(
               
-                <Button key= {index} color="inherit" href={link.link !== "#" ? link.link : undefined}
-                onClick={link.text === "Logout" ? () => handleClick(link.text) : undefined} variant='text' sx={{ fontWeight: 'bold' }}>
+                <Button key= {index} href={link.link !== "#" ? link.link : undefined}
+                onClick={link.text === "Logout" ? () => handleClick(link.text) : undefined} variant='text' sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'primary.main', mx: 1} }>
                  {link.text}
                 </Button>
               
