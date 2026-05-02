@@ -28,7 +28,7 @@ React.useEffect(() => {
         userName: tutor.userName,
         name: tutor.name,
         birthday: tutor.birthday,
-        subjects: tutor.subjects,
+        subjects: tutor.subjects ? tutor.subjects.split(',').join(', ') : "", // add space after each subject
         availability: tutor.availability
     }))
     )
