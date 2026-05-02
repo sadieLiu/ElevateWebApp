@@ -2,7 +2,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import { Container, Box, Grid, Typography, Paper } from "@mui/material";
-import TutorInfoCard from "../components/TutorInfoCard"; 
+import TutorInfoCard from "../components/TutorInfoCard";
 import TutorDropdown from "../components/tutorPicker";
 import { useAuth } from "../context/AuthContext";
 
@@ -39,7 +39,7 @@ const TutorInfoPage: React.FC = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+        <Container maxWidth="xl" sx={{ mt: 10, mb: 8 }}>
             <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
                 Tutor Directory
             </Typography>
@@ -50,7 +50,7 @@ const TutorInfoPage: React.FC = () => {
             <Grid container spacing={4}>
 
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid #e0e0e0', bgcolor: '#f8f9fa' }}>
+                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid #e0e0e0', borderColor: 'divider', bgcolor: 'background.paper', position: 'sticky' }}>
                         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase' }}>
                             Select Tutor from Dropdown
                         </Typography>
@@ -58,25 +58,32 @@ const TutorInfoPage: React.FC = () => {
                         <TutorDropdown
                             tutors={tutors}
                             selected={selectedTutor}
-                            onSelect={setSelectedTutor}/>
+                            onSelect={setSelectedTutor} />
                     </Paper>
                 </Grid>
 
 
                 <Grid size={{ xs: 12, md: 8 }}>
-                    {selectedTutor && (
-                        <TutorInfoCard
-                            name={selectedTutor.name}
-                            birthday={selectedTutor.birthday}
-                            subjects={selectedTutor.subjects}
-                            availability={selectedTutor.availability}
-                            isAdmin={selectedTutor.isAdmin}/>
-                    )}
+                    <Box key={selectedTutor?.tutorId} sx={{
+                        animation: 'fadeIn 0.4s ease-out', '@keyframes fadeIn': {
+                            from: { opacity: 0, transform: 'translateY(10px)' }, to:
+                                { opacity: 1, transform: 'translateY(0)' }
+                        }}}>
 
+
+                        {selectedTutor && (
+                            <TutorInfoCard
+                                name={selectedTutor.name}
+                                birthday={selectedTutor.birthday}
+                                subjects={selectedTutor.subjects}
+                                availability={selectedTutor.availability}
+                                isAdmin={selectedTutor.isAdmin} />
+                        )}
+                    </Box>
                 </Grid>
             </Grid>
         </Container>
-    ); 
+    );
 };
 
 export default TutorInfoPage;

@@ -24,9 +24,9 @@ const TutorDropdown: React.FC<Props> = ({ tutors, selected, onSelect }) => {
     return (
 
         <select
-            value={selected?.name || ""}
+            value={selected?.tutorId || ""}
             onChange={(e) => {
-                const tutor = sorted.find(t => t.name === e.target.value);
+                const tutor = sorted.find(t => t.tutorId === Number(e.target.value));
                 if (tutor) onSelect(tutor);
             }}
             style={styles.select}
@@ -36,7 +36,7 @@ const TutorDropdown: React.FC<Props> = ({ tutors, selected, onSelect }) => {
             </option>
 
             {sorted.map((t) => (
-                <option key={t.tutorId} value={t.name}>
+                <option key={t.tutorId} value={t.tutorId}>
                     {t.name}
                 </option>
             ))}
