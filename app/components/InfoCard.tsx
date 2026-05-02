@@ -1,4 +1,4 @@
-//dummy info cards for use in student/tutor info pages to be flooded with info through api database later on
+//DELETE? dummy info cards for use in student/tutor info pages to be flooded with info through api database later on
 'use client';
 import React, { useState } from "react";
 import InfoC from "react";
