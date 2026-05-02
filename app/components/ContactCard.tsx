@@ -44,7 +44,7 @@ export default function ContactSection() {
                 {contactUs.map((item) => {
                     const Icon = item.icon; 
                     return (
-                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={item.id}>
+                        <Grid size={{ xs: 12, sm: 6, md: 1.95 }} key={item.id}>
                             <Card sx={{
                                 height: '100%', 
                                 borderRadius: 6, 
