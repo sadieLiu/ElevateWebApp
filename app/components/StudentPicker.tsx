@@ -1,3 +1,4 @@
+/* This component works with the student info card component on the student info page */
 import React from "react";
 
 type Student = {
@@ -13,7 +14,7 @@ type Student = {
 
 type Props = {
   students: Student[];
-  selected: Student;
+  selected: Student | null;
   onSelect: (student: Student) => void;
 };
 
@@ -32,10 +33,14 @@ const StudentDropdown: React.FC<Props> = ({ students, selected, onSelect }) => {
       }}
       style={styles.select}
     >
+      <option value="" disabled>
+        Select a student
+      </option>
+
       {sorted.map((s) => (
         <option key={s.studentId} value={s.studentId}>
-  {s.name}
-</option>
+          {s.name}
+        </option>
       ))}
     </select>
   );
@@ -43,10 +48,17 @@ const StudentDropdown: React.FC<Props> = ({ students, selected, onSelect }) => {
 
 const styles = {
   select: {
-    padding: "8px 12px",
+    padding: "10px 15px",
     fontSize: "16px",
     borderRadius: "8px",
+    width: "100%",
+    border: "2px solid secondary.dark",
+    backgroundColor: "#f5f5f5",
+    cursor: "pointer",
+    outline: "none",
+    transition: "border-color 0.3s",
     marginBottom: "20px",
+    boxShadow: '5'
   },
 };
 

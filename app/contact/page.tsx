@@ -14,12 +14,12 @@ export default function Contact() {
 
   return (
     <>
-      <Container maxWidth="lg" disableGutters>
-        <Container maxWidth="lg">
+      <Container maxWidth="xl" disableGutters>
+        <Container maxWidth="xl">
           
           <Box
             sx={{
-              mt: 10,
+              mt: 24,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',

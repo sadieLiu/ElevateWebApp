@@ -1,63 +1,93 @@
-/* This is the student info page */
+/* This page shows information for all students in the database */
 'use client';
-import React, { useState, useEffect } from "react";
-import Container from "@mui/material/Container";
-import InfoCard from "../components/InfoCard";
-import StudentPicker from "../components/StudentPicker";
+import React, { useEffect, useState } from "react";
+import { Container, Box, Grid, Typography, Paper } from "@mui/material";
+import StudentInfoCard from "../components/StudentInfoCard";
+import StudentDropdown from "../components/StudentPicker";
+import { useAuth } from "../context/AuthContext";
 
-const students = [
-  { name: "Alex Johnson", birthday: "March 12, 2008", school: "Sunrise High School", gradeLevel: "11th Grade", location: "Elevate Online",  parent: "Kylie Johnson", contact:"kyliejohnson@gmail.com" },
-  { name: "Maria Lopez", birthday: "June 5, 2007", school: "Westview Academy", gradeLevel: "12th Grade", location: "Elevate Edu", parent: "Pedro Lopez", contact:"(123) 456-7890"},
-  { name: "Scarlet Rivera", birthday: "January 5, 2007", school: "Mountain View High School", gradeLevel: "12th Grade", location: "Elevate Prep",parent: "Cecelia Rivera", contact:"(123) 456-7890" },
-];
-
-const StudentInfoPage: React.FC = () => {
-  const [selectedStudent, setSelectedStudent] = useState<any>({});
-  const [studentsData, setStudentsData] = useState([]);
-  useEffect(() => {
-  fetch("http://localhost:5000/api/students")
-    .then((res) => res.json())
-    .then((data) => {
-  console.log(data);
-  setStudentsData(data);
-  if (data.length > 0) {
-    setSelectedStudent(data[0]);
-  }
-})
-    .catch((err) => console.error(err));
-}, []);
-
-  return (
-    <Container maxWidth="sm" style={styles.wrapper}>
-      <div>
-        <StudentPicker
-            students={studentsData}
-            selected={selectedStudent}
-            onSelect={setSelectedStudent}
-        />
-        {selectedStudent && (
-  <InfoCard
-    name={selectedStudent.name}
-birthday={selectedStudent.birthday}
-school={selectedStudent.school}
-gradeLevel={selectedStudent.grade}
-location={selectedStudent.location}
-parent={selectedStudent.parentName}
-contact={selectedStudent.parentEmail}
-  />
-)}
-      </div>
-    </Container>
-  );
+type Student = {
+  studentId: number;
+  name: string;
+  birthday: string;
+  school: string;
+  grade: string;
+  location: string;
+  parentName: string;
+  parentEmail: string;
 };
 
-const styles = {
-  wrapper: {
-    display: "flex",
-    justifyContent: "center", // horizontal centering
-    alignItems: "center",     // vertical centering
-    height: "100vh",          // full screen height
-  },
+const StudentInfoPage: React.FC = () => {
+    const [students, setStudents] = useState<Student[]>([]);
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+    const { user, isLoading: isAuthLoading } = useAuth();
+    const [dataLoading, setDataLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStudents = async () => {
+            const response = await fetch("http://127.0.0.1:5000/api/students");
+            const data: Student[] = await response.json();
+            setStudents(data);
+            if (data.length > 0) setSelectedStudent(data[0]);
+            setDataLoading(false);
+        }
+        fetchStudents();
+
+    }, []);
+
+
+    if (isAuthLoading || dataLoading) { // this makes sure that the dropdown and info table render at the same time
+        return <Typography variant="h5" align="center" sx={{ mt: 4 }}>Loading Page...</Typography>;
+    }
+
+    return (
+        <Container maxWidth="xl" sx={{ mt: 10, mb: 8 }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, mb: 1 }}>
+                Student Directory
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 5, fontSize: '1.3rem', fontWeight: 500 }}>
+                Manage and view your student's profiles.
+            </Typography>
+
+            <Grid container spacing={4}>
+
+                <Grid size={{ xs: 12, md: 4 }}>
+                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid #e0e0e0', borderColor: 'divider', bgcolor: 'background.paper', position: 'sticky' }}>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase' }}>
+                            Select Student from Dropdown
+                        </Typography>
+
+                        <StudentDropdown
+                            students={students}
+                            selected={selectedStudent}
+                            onSelect={setSelectedStudent} />
+                    </Paper>
+                </Grid>
+
+
+                <Grid size={{ xs: 12, md: 8 }}>
+                    <Box key={selectedStudent?.studentId} sx={{
+                        animation: 'fadeIn 0.4s ease-out', '@keyframes fadeIn': {
+                            from: { opacity: 0, transform: 'translateY(10px)' }, to:
+                                { opacity: 1, transform: 'translateY(0)' }
+                        }}}>
+
+
+                        {selectedStudent && (
+                            <StudentInfoCard
+                                name={selectedStudent.name}
+                                birthday={selectedStudent.birthday}
+                                school={selectedStudent.school}
+                                grade={selectedStudent.grade}
+                                location={selectedStudent.location}
+                                parentName={selectedStudent.parentName}
+                                parentEmail={selectedStudent.parentEmail} />
+                        )}
+                    </Box>
+                </Grid>
+            </Grid>
+        </Container>
+    );
 };
 
 export default StudentInfoPage;
