@@ -64,7 +64,7 @@ export default function TutorView() {
             label: "Students",
             icon: BackpackIcon,
             info: "View your student profiles",
-            path: "/students"
+            path: "/studentInfo"
         }
     ];
 
@@ -78,7 +78,7 @@ export default function TutorView() {
 
                 <Grid container spacing={3}>
                     {tutorStats.map((stat) => (
-                        <Grid size={{ xs: 1, md: 4 }} key={stat.label}>
+                        <Grid size={{ xs: 12, md: 4 }} key={stat.label}>
                             <Card sx={{ height: '100%', borderRadius: 2, boxShadow: 4, transition: '0.3s', '&:hover': { boxShadow: 12 } }}>
                                 <CardContent sx={{ pt: 3 }}>
                                     <Box sx={{ p: 1.75, borderRadius: 3, backgroundColor: 'secondary.dark', display: 'inline-flex', mb: 2 }}>
@@ -96,8 +96,6 @@ export default function TutorView() {
                     ))}
                 </Grid>
             </Box>
-
-            {/* Upcoming tutor sessions section */}
             
             {/* Upcoming session */}
             <Box sx={{ py: 3, px: 2 }}>
@@ -134,7 +132,7 @@ export default function TutorView() {
 
                                                
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                    <WatchLaterIcon fontSize="small" sx={{ color: 'black', fontSize: 16 }} />
+                                                    <WatchLaterIcon fontSize="small" sx={{ color: 'gray', fontSize: 16 }} />
                                                     <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
                                                         {new Date(session.startDateTime).toLocaleString("en-US", {
                                                             weekday: 'long',
@@ -161,7 +159,7 @@ export default function TutorView() {
 
 
             {/* Quick action for tutor section */}
-            <Box sx={{ py: 3, px: 2 }}>
+            <Box sx={{ py: 3, px: 2, pb: 10 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Actions
                 </Typography>

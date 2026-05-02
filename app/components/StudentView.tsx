@@ -130,7 +130,7 @@ export default function StudentView() {
 
                                                
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                    <WatchLaterIcon fontSize="small" sx={{ color: 'black', fontSize: 16 }} />
+                                                    <WatchLaterIcon fontSize="small" sx={{ color: 'gray', fontSize: 16 }} />
                                                     <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
                                                         {new Date(session.startDateTime).toLocaleString("en-US", {
                                                             weekday: 'long',
@@ -157,7 +157,7 @@ export default function StudentView() {
 
 
             {/* Quick action section for student */}
-            <Box sx={{ py: 3, px: 2 }}>
+            <Box sx={{ py: 3, px: 2, pb: 10 }}>
                 <Typography variant="h5" textAlign="left" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                     Quick Actions
                 </Typography>
