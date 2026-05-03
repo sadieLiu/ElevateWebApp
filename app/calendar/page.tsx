@@ -33,6 +33,19 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
+const parseMySQLDate = (value: string) => {
+  const date = new Date(value);
+
+  return new Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds()
+  );
+};
+
 const toLocalInputValue = (date: Date) => {
   const offset = date.getTimezoneOffset();
   const local = new Date(date.getTime() - offset * 60000);
@@ -46,23 +59,14 @@ const toMySQLFormat = (date: Date) => {
 };
 
 const timeOptions = [
-  "08:00", "08:30",
-  "09:00", "09:30",
-  "10:00", "10:30",
-  "11:00", "11:30",
-  "12:00", "12:30",
-  "13:00", "13:30",
-  "14:00", "14:30",
-  "15:00", "15:30",
-  "16:00", "16:30",
-  "17:00", "17:30",
-  "18:00", "18:30",
-  "19:00", "19:30",
-  "20:00",
+  "08:00","08:30","09:00","09:30","10:00","10:30",
+  "11:00","11:30","12:00","12:30","13:00","13:30",
+  "14:00","14:30","15:00","15:30","16:00","16:30",
+  "17:00","17:30","18:00","18:30","19:00","19:30","20:00",
 ];
 
 const getTimeValue = (date: Date) => {
-  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  return `${String(date.getHours()).padStart(2,"0")}:${String(date.getMinutes()).padStart(2,"0")}`;
 };
 
 const setTimeOnDate = (date: Date, time: string) => {
@@ -106,8 +110,8 @@ export default function TutorCalendar({ allowScheduling = false }) {
           student: session.studentId,
           tutor: session.tutorId,
           notes: session.notes,
-          start: new Date(session.startDateTime + " UTC"),
-          end: new Date(session.endDateTime + " UTC"),
+          start: parseMySQLDate(session.startDateTime),
+          end: parseMySQLDate(session.endDateTime),
         }));
         setEvents(formattedEvents);
       });
@@ -135,17 +139,14 @@ export default function TutorCalendar({ allowScheduling = false }) {
             onClick={() => {
               setIsEditing(false);
               setSelectedEvent(null);
-
               setTitle("");
               setStudent("");
               setTutor("");
               setNotes("");
-
               setSelectedSlot({
                 start: new Date(),
-                end: new Date(new Date().getTime() + 60 * 60 * 1000),
+                end: new Date(new Date().getTime() + 60*60*1000),
               });
-
               setOpen(true);
             }}
           >
@@ -164,7 +165,6 @@ export default function TutorCalendar({ allowScheduling = false }) {
             timeslots={2}
             onSelectEvent={(event) => {
               if (!allowScheduling) return;
-
               setSelectedEvent(event);
               setIsEditing(true);
               setTitle(event.title);
@@ -176,20 +176,16 @@ export default function TutorCalendar({ allowScheduling = false }) {
             }}
             onSelectSlot={(slotInfo) => {
               if (!allowScheduling) return;
-
               setIsEditing(false);
               setSelectedEvent(null);
-
               setTitle("");
               setStudent("");
               setTutor("");
               setNotes("");
-
               setSelectedSlot({
                 start: slotInfo.start,
                 end: slotInfo.end,
               });
-
               setOpen(true);
             }}
             defaultView="week"
@@ -223,9 +219,7 @@ export default function TutorCalendar({ allowScheduling = false }) {
                 }}
               >
                 {timeOptions.map((time) => (
-                  <MenuItem key={time} value={time}>
-                    {time}
-                  </MenuItem>
+                  <MenuItem key={time} value={time}>{time}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -243,63 +237,46 @@ export default function TutorCalendar({ allowScheduling = false }) {
                 }}
               >
                 {timeOptions.map((time) => (
-                  <MenuItem key={time} value={time}>
-                    {time}
-                  </MenuItem>
+                  <MenuItem key={time} value={time}>{time}</MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <TextField
-              label="Session Title"
-              fullWidth
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <TextField label="Session Title" fullWidth value={title} onChange={(e)=>setTitle(e.target.value)} />
 
             <FormControl fullWidth>
               <InputLabel>Student</InputLabel>
-              <Select value={student} onChange={(e) => setStudent(Number(e.target.value))}>
-                {students.map((s: any) => (
-                  <MenuItem key={s.studentId} value={s.studentId}>
-                    {s.name}
-                  </MenuItem>
+              <Select value={student} onChange={(e)=>setStudent(Number(e.target.value))}>
+                {students.map((s:any)=>(
+                  <MenuItem key={s.studentId} value={s.studentId}>{s.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
 
             <FormControl fullWidth>
               <InputLabel>Tutor</InputLabel>
-              <Select value={tutor} onChange={(e) => setTutor(Number(e.target.value))}>
-                {tutors.map((t: any) => (
-                  <MenuItem key={t.tutorId} value={t.tutorId}>
-                    {t.name}
-                  </MenuItem>
+              <Select value={tutor} onChange={(e)=>setTutor(Number(e.target.value))}>
+                {tutors.map((t:any)=>(
+                  <MenuItem key={t.tutorId} value={t.tutorId}>{t.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <TextField
-              label="Notes"
-              fullWidth
-              multiline
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
+            <TextField label="Notes" fullWidth multiline value={notes} onChange={(e)=>setNotes(e.target.value)} />
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={()=>setOpen(false)}>Cancel</Button>
 
             {allowScheduling && (
               <>
                 {isEditing && selectedEvent && (
                   <Button
                     color="error"
-                    onClick={() => {
-                      fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
-                        method: "DELETE",
-                      }).then(() => window.location.reload());
+                    onClick={()=>{
+                      fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`,{
+                        method:"DELETE",
+                      }).then(()=>window.location.reload());
                     }}
                   >
                     Delete
@@ -308,54 +285,69 @@ export default function TutorCalendar({ allowScheduling = false }) {
 
                 <Button
                   variant="contained"
-                  onClick={() => {
-                    if (!selectedSlot || !title) return;
+                  onClick={()=>{
+                    if(!selectedSlot || !title) return;
 
                     const start = selectedSlot.start;
                     const end = selectedSlot.end;
 
-                    if (start.getHours() < 8 || end.getHours() > 20) {
+                    if(start.getHours()<8 || end.getHours()>20){
                       alert("Sessions must be between 8 AM and 8 PM");
                       return;
                     }
 
-                    const validMinutes = [0, 30];
-                    if (
-                      !validMinutes.includes(start.getMinutes()) ||
-                      !validMinutes.includes(end.getMinutes())
-                    ) {
+                    const validMinutes=[0,30];
+                    if(!validMinutes.includes(start.getMinutes()) || !validMinutes.includes(end.getMinutes())){
                       alert("Time must be in 30-minute intervals");
                       return;
                     }
 
-                    if (isEditing && selectedEvent) {
-                      fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          tutorId: tutor,
-                          studentId: student || null,
-                          subjects: title,
-                          startDateTime: toMySQLFormat(start),
-                          endDateTime: toMySQLFormat(end),
-                          location: "online",
-                          notes: notes,
+                    if(isEditing && selectedEvent){
+                      fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`,{
+                        method:"PUT",
+                        headers:{"Content-Type":"application/json"},
+                        body:JSON.stringify({
+                          tutorId:tutor,
+                          studentId:student||null,
+                          subjects:title,
+                          startDateTime:toMySQLFormat(start),
+                          endDateTime:toMySQLFormat(end),
+                          location:"online",
+                          notes:notes,
                         }),
-                      }).then(() => window.location.reload());
+                      }).then(async (res) => {
+                        const data = await res.json();
+
+                        if (!res.ok) {
+                          alert(data.message);
+                          return;
+                        }
+
+                        window.location.reload();
+                      });
                     } else {
-                      fetch("http://127.0.0.1:5000/api/sessions", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          tutorId: tutor,
-                          studentId: student || null,
-                          subjects: title,
-                          startDateTime: toMySQLFormat(start),
-                          endDateTime: toMySQLFormat(end),
-                          location: "online",
-                          notes: notes,
+                      fetch("http://127.0.0.1:5000/api/sessions",{
+                        method:"POST",
+                        headers:{"Content-Type":"application/json"},
+                        body:JSON.stringify({
+                          tutorId:tutor,
+                          studentId:student||null,
+                          subjects:title,
+                          startDateTime:toMySQLFormat(start),
+                          endDateTime:toMySQLFormat(end),
+                          location:"online",
+                          notes:notes,
                         }),
-                      }).then(() => window.location.reload());
+                      }).then(async (res) => {
+                        const data = await res.json();
+
+                        if (!res.ok) {
+                          alert(data.message);
+                          return;
+                        }
+
+                        window.location.reload();
+                      });
                     }
                   }}
                 >
