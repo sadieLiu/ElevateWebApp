@@ -230,7 +230,7 @@ async function handleAddStudent() {
       fullWidth
       value={newBirthday}
       placeholder="YYYY-MM-DD"
-      inputProps={{ maxlength: 10 }}
+      inputProps={{ maxLength: 10 }}
       onChange={(e) =>  {
         // Ensure the date is in YYYY-MM-DD format
         let v = e.target.value.replace(/\D/g, ""); // Remove non-digit characters

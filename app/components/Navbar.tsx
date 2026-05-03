@@ -47,11 +47,11 @@ const Navbar = () => {
         },
         {
           text: "Students",
-          link: "/studentInfo"
+          link: "/studentOverview"
         },
         {
           text: "Tutors",
-          link: "/tutorInfo"
+          link: "/tutorOverview"
         },
         {
           text: "Logout",
@@ -73,6 +73,10 @@ const Navbar = () => {
         link: "/studentInfo"
       },
       {
+        text: "Tutors",
+        link: "/tutorInfo"
+      },
+      {
           text: "Logout",
           link: "#"
       }
@@ -86,6 +90,10 @@ const Navbar = () => {
       {
         text: "Calendar",
         link: "/calendar"
+      },
+       {
+        text: "Tutors",
+        link: "/tutorInfo"
       },
        {
           text: "Logout",

@@ -63,8 +63,14 @@ export default function TutorView() {
         {
             label: "Students",
             icon: BackpackIcon,
-            info: "View your student profiles",
+            info: "View student profiles",
             path: "/studentInfo"
+        },
+        {
+            label: "Tutors",
+            icon: PersonIcon,
+            info: "View tutor profiles",
+            path: "/tutorInfo"
         }
     ];
 

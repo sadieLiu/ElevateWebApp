@@ -33,6 +33,45 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
+const toLocalInputValue = (date: Date) => {
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 16);
+};
+
+const toMySQLFormat = (date: Date) => {
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 19).replace("T", " ");
+};
+
+const timeOptions = [
+  "08:00", "08:30",
+  "09:00", "09:30",
+  "10:00", "10:30",
+  "11:00", "11:30",
+  "12:00", "12:30",
+  "13:00", "13:30",
+  "14:00", "14:30",
+  "15:00", "15:30",
+  "16:00", "16:30",
+  "17:00", "17:30",
+  "18:00", "18:30",
+  "19:00", "19:30",
+  "20:00",
+];
+
+const getTimeValue = (date: Date) => {
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+};
+
+const setTimeOnDate = (date: Date, time: string) => {
+  const [hour, minute] = time.split(":").map(Number);
+  const updated = new Date(date);
+  updated.setHours(hour, minute, 0, 0);
+  return updated;
+};
+
 interface EventType {
   id: number;
   title: string;
@@ -64,9 +103,9 @@ export default function TutorCalendar({ allowScheduling = false }) {
         const formattedEvents = data.map((session: any) => ({
           id: session.sessionId,
           title: session.subjects,
-          student: "",
+          student: session.studentId,
           tutor: session.tutorId,
-          notes: "",
+          notes: session.notes,
           start: new Date(session.startDateTime + " UTC"),
           end: new Date(session.endDateTime + " UTC"),
         }));
@@ -121,6 +160,8 @@ export default function TutorCalendar({ allowScheduling = false }) {
             startAccessor="start"
             endAccessor="end"
             selectable={allowScheduling}
+            step={30}
+            timeslots={2}
             onSelectEvent={(event) => {
               if (!allowScheduling) return;
 
@@ -169,41 +210,45 @@ export default function TutorCalendar({ allowScheduling = false }) {
               </Box>
             )}
 
-            <TextField
-              label="Start Time"
-              type="datetime-local"
-              fullWidth
-              margin="dense"
-              value={
-                selectedSlot
-                  ? new Date(selectedSlot.start).toISOString().slice(0, 16)
-                  : ""
-              }
-              onChange={(e) => {
-                const newStart = new Date(e.target.value);
-                setSelectedSlot((prev) =>
-                  prev ? { ...prev, start: newStart } : null
-                );
-              }}
-            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Start Time</InputLabel>
+              <Select
+                value={selectedSlot ? getTimeValue(selectedSlot.start) : ""}
+                label="Start Time"
+                onChange={(e) => {
+                  if (!selectedSlot) return;
+                  setSelectedSlot((prev) =>
+                    prev ? { ...prev, start: setTimeOnDate(prev.start, e.target.value) } : null
+                  );
+                }}
+              >
+                {timeOptions.map((time) => (
+                  <MenuItem key={time} value={time}>
+                    {time}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-            <TextField
-              label="End Time"
-              type="datetime-local"
-              fullWidth
-              margin="dense"
-              value={
-                selectedSlot
-                  ? new Date(selectedSlot.end).toISOString().slice(0, 16)
-                  : ""
-              }
-              onChange={(e) => {
-                const newEnd = new Date(e.target.value);
-                setSelectedSlot((prev) =>
-                  prev ? { ...prev, end: newEnd } : null
-                );
-              }}
-            />
+            <FormControl fullWidth margin="dense">
+              <InputLabel>End Time</InputLabel>
+              <Select
+                value={selectedSlot ? getTimeValue(selectedSlot.end) : ""}
+                label="End Time"
+                onChange={(e) => {
+                  if (!selectedSlot) return;
+                  setSelectedSlot((prev) =>
+                    prev ? { ...prev, end: setTimeOnDate(prev.end, e.target.value) } : null
+                  );
+                }}
+              >
+                {timeOptions.map((time) => (
+                  <MenuItem key={time} value={time}>
+                    {time}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <TextField
               label="Session Title"
@@ -269,19 +314,17 @@ export default function TutorCalendar({ allowScheduling = false }) {
                     const start = selectedSlot.start;
                     const end = selectedSlot.end;
 
-                    // 8 AM to 8 PM check
                     if (start.getHours() < 8 || end.getHours() > 20) {
                       alert("Sessions must be between 8 AM and 8 PM");
                       return;
                     }
 
-                    // 15-minute intervals
-                    const validMinutes = [0, 15, 30, 45];
+                    const validMinutes = [0, 30];
                     if (
                       !validMinutes.includes(start.getMinutes()) ||
                       !validMinutes.includes(end.getMinutes())
                     ) {
-                      alert("Time must be in 15-minute intervals (00, 15, 30, 45)");
+                      alert("Time must be in 30-minute intervals");
                       return;
                     }
 
@@ -290,10 +333,13 @@ export default function TutorCalendar({ allowScheduling = false }) {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
+                          tutorId: tutor,
+                          studentId: student || null,
                           subjects: title,
-                          startDateTime: start.toISOString().slice(0, 19).replace("T", " "),
-                          endDateTime: end.toISOString().slice(0, 19).replace("T", " "),
+                          startDateTime: toMySQLFormat(start),
+                          endDateTime: toMySQLFormat(end),
                           location: "online",
+                          notes: notes,
                         }),
                       }).then(() => window.location.reload());
                     } else {
@@ -302,11 +348,12 @@ export default function TutorCalendar({ allowScheduling = false }) {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                           tutorId: tutor,
-                          studentId: student,
+                          studentId: student || null,
                           subjects: title,
-                          startDateTime: start.toISOString().slice(0, 19).replace("T", " "),
-                          endDateTime: end.toISOString().slice(0, 19).replace("T", " "),
+                          startDateTime: toMySQLFormat(start),
+                          endDateTime: toMySQLFormat(end),
                           location: "online",
+                          notes: notes,
                         }),
                       }).then(() => window.location.reload());
                     }

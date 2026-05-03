@@ -59,10 +59,10 @@ export default function StudentView() {
             path: "/calendar"
         },
         {
-            label: "Notes",
+            label: "Tutors",
             icon: DescriptionIcon,
-            info: "View notes from your tutoring sessions",
-            path: "/notes"
+            info: "View tutor profiles",
+            path: "/tutorInfo"
         }
     ];
 
