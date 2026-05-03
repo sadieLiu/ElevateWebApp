@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Box,
@@ -22,11 +22,8 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useEffect } from "react";
 
-const locales = {
-  "en-US": enUS,
-};
+const locales = { "en-US": enUS };
 
 const localizer = dateFnsLocalizer({
   format,
@@ -40,66 +37,16 @@ interface EventType {
   id: number;
   title: string;
   student: number | "";
-tutor: number | "";
+  tutor: number | "";
   notes: string;
   start: Date;
   end: Date;
 }
 
 export default function TutorCalendar({ allowScheduling = false }) {
-  const [events, setEvents] = useState<EventType[]>([
-    {
-      id: 1,
-      title: "Math Tutoring",
-      student: "",
-tutor: "",
-      notes: "Sample session",
-      start: new Date(2026, 1, 17, 10, 0),
-      end: new Date(2026, 1, 17, 11, 0),
-    },
-    {
-      id: 2,
-      title: "Science Tutoring",
-      student: "",
-tutor: "",
-      notes: "Sample session",
-      start: new Date(2026, 1, 18, 11, 0),
-      end: new Date(2026, 1, 18, 12, 0),
-    },
-  ]);
-
-const [students, setStudents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [tutors, setTutors] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/sessions")
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedEvents = data.map((session: any) => ({
-  id: session.sessionId,
-  title: session.subjects,
-  student: "",
-  tutor: session.tutorId,
-          notes: "",
-          start: new Date(session.startDateTime + " UTC"),
-          end: new Date(session.endDateTime + " UTC"),
-        }));
-        setEvents(formattedEvents);
-      })
-      .catch((err) => console.error(err));
-  }, []);
-
-  useEffect(() => {
-  fetch("http://127.0.0.1:5000/api/students")
-    .then((res) => res.json())
-    .then((data) => setStudents(data))
-    .catch((err) => console.error(err));
-
-  fetch("http://127.0.0.1:5000/api/tutors")
-    .then((res) => res.json())
-    .then((data) => setTutors(data))
-    .catch((err) => console.error(err));
-}, []);
 
   const [open, setOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ start: Date; end: Date } | null>(null);
@@ -109,14 +56,63 @@ const [students, setStudents] = useState<any[]>([]);
   const [notes, setNotes] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:5000/api/sessions")
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedEvents = data.map((session: any) => ({
+          id: session.sessionId,
+          title: session.subjects,
+          student: "",
+          tutor: session.tutorId,
+          notes: "",
+          start: new Date(session.startDateTime + " UTC"),
+          end: new Date(session.endDateTime + " UTC"),
+        }));
+        setEvents(formattedEvents);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:5000/api/students")
+      .then((res) => res.json())
+      .then(setStudents);
+
+    fetch("http://127.0.0.1:5000/api/tutors")
+      .then((res) => res.json())
+      .then(setTutors);
+  }, []);
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 6 }}>
-        <Typography variant="h4" gutterBottom>
-          Tutoring Schedule
-        </Typography>
+        <Typography variant="h4">Tutoring Schedule</Typography>
+
+        {allowScheduling && (
+          <Button
+            variant="contained"
+            sx={{ mb: 2 }}
+            onClick={() => {
+              setIsEditing(false);
+              setSelectedEvent(null);
+
+              setTitle("");
+              setStudent("");
+              setTutor("");
+              setNotes("");
+
+              setSelectedSlot({
+                start: new Date(),
+                end: new Date(new Date().getTime() + 60 * 60 * 1000),
+              });
+
+              setOpen(true);
+            }}
+          >
+            Add Session
+          </Button>
+        )}
 
         <Paper sx={{ height: 600, p: 2 }}>
           <Calendar
@@ -126,6 +122,8 @@ const [students, setStudents] = useState<any[]>([]);
             endAccessor="end"
             selectable={allowScheduling}
             onSelectEvent={(event) => {
+              if (!allowScheduling) return;
+
               setSelectedEvent(event);
               setIsEditing(true);
               setTitle(event.title);
@@ -138,10 +136,19 @@ const [students, setStudents] = useState<any[]>([]);
             onSelectSlot={(slotInfo) => {
               if (!allowScheduling) return;
 
+              setIsEditing(false);
+              setSelectedEvent(null);
+
+              setTitle("");
+              setStudent("");
+              setTutor("");
+              setNotes("");
+
               setSelectedSlot({
                 start: slotInfo.start,
                 end: slotInfo.end,
               });
+
               setOpen(true);
             }}
             defaultView="week"
@@ -149,153 +156,167 @@ const [students, setStudents] = useState<any[]>([]);
           />
         </Paper>
 
-        <Dialog open={open} onClose={() => setOpen(false)}>
+        <Dialog open={open && allowScheduling} onClose={() => setOpen(false)}>
           <DialogTitle>
             {isEditing ? "Edit Tutoring Session" : "Add Tutoring Session"}
           </DialogTitle>
 
           <DialogContent>
-
-{selectedSlot && (
-  <Box sx={{ mb: 2 }}>
-    <Typography variant="body2">
-      Start: {selectedSlot.start.toLocaleString()}
-    </Typography>
-    <Typography variant="body2">
-      End: {selectedSlot.end.toLocaleString()}
-    </Typography>
-  </Box>
-)}
-
+            {selectedSlot && (
+              <Box sx={{ mb: 2 }}>
+                <Typography>Start: {selectedSlot.start.toLocaleString()}</Typography>
+                <Typography>End: {selectedSlot.end.toLocaleString()}</Typography>
+              </Box>
+            )}
 
             <TextField
-              autoFocus
+              label="Start Time"
+              type="datetime-local"
+              fullWidth
               margin="dense"
+              value={
+                selectedSlot
+                  ? new Date(selectedSlot.start).toISOString().slice(0, 16)
+                  : ""
+              }
+              onChange={(e) => {
+                const newStart = new Date(e.target.value);
+                setSelectedSlot((prev) =>
+                  prev ? { ...prev, start: newStart } : null
+                );
+              }}
+            />
+
+            <TextField
+              label="End Time"
+              type="datetime-local"
+              fullWidth
+              margin="dense"
+              value={
+                selectedSlot
+                  ? new Date(selectedSlot.end).toISOString().slice(0, 16)
+                  : ""
+              }
+              onChange={(e) => {
+                const newEnd = new Date(e.target.value);
+                setSelectedSlot((prev) =>
+                  prev ? { ...prev, end: newEnd } : null
+                );
+              }}
+            />
+
+            <TextField
               label="Session Title"
               fullWidth
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
 
-            <FormControl fullWidth margin="dense">
-  <InputLabel>Student</InputLabel>
-  <Select
-    value={student}
-    label="Student"
-    onChange={(e) => setStudent(Number(e.target.value))}
-  >
-    {students.map((s: any) => (
-      <MenuItem key={s.studentId} value={s.studentId}>
-        {s.name}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Student</InputLabel>
+              <Select value={student} onChange={(e) => setStudent(Number(e.target.value))}>
+                {students.map((s: any) => (
+                  <MenuItem key={s.studentId} value={s.studentId}>
+                    {s.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-            <FormControl fullWidth margin="dense">
-  <InputLabel>Tutor</InputLabel>
-  <Select
-    value={tutor}
-    label="Tutor"
-    onChange={(e) => setTutor(Number(e.target.value))}
-  >
-    {tutors.map((t: any) => (
-      <MenuItem key={t.tutorId} value={t.tutorId}>
-        {t.name}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Tutor</InputLabel>
+              <Select value={tutor} onChange={(e) => setTutor(Number(e.target.value))}>
+                {tutors.map((t: any) => (
+                  <MenuItem key={t.tutorId} value={t.tutorId}>
+                    {t.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
             <TextField
-              margin="dense"
               label="Notes"
               fullWidth
               multiline
-              rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
           </DialogContent>
 
           <DialogActions>
-  <Button onClick={() => setOpen(false)}>Cancel</Button>
-{isEditing && selectedEvent && (
-    <Button
-      color="error"
-      onClick={() => {
-        fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
-          method: "DELETE",
-        }).then(() => {
-          window.location.reload();
-        });
-      }}
-    >
-      Delete
-    </Button>
-  )}
-  <Button
-    variant="contained"
-    onClick={() => {
-      if (!selectedSlot || !title) return;
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
 
-      if (isEditing && selectedEvent) {
-        fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            subjects: title,
-            startDateTime: selectedSlot.start.toISOString().slice(0, 19).replace("T", " "),
-            endDateTime: selectedSlot.end.toISOString().slice(0, 19).replace("T", " "),
-            location: "online",
-          }),
-        }).then((res) => {
-  if (!res.ok) {
-    return res.json().then((data) => {
-      alert(data.message);
-    });
-  }
-  window.location.reload();
-});
-      } else {
-        fetch("http://127.0.0.1:5000/api/sessions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-  tutorId: tutor,
-  studentId: student,
-  subjects: title,
-            startDateTime: selectedSlot.start.toISOString().slice(0, 19).replace("T", " "),
-            endDateTime: selectedSlot.end.toISOString().slice(0, 19).replace("T", " "),
-            location: "online",
-          }),
-        }).then((res) => {
-  if (!res.ok) {
-    return res.json().then((data) => {
-      alert(data.message);
-    });
-  }
-  window.location.reload();
-});
-      }
+            {allowScheduling && (
+              <>
+                {isEditing && selectedEvent && (
+                  <Button
+                    color="error"
+                    onClick={() => {
+                      fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
+                        method: "DELETE",
+                      }).then(() => window.location.reload());
+                    }}
+                  >
+                    Delete
+                  </Button>
+                )}
 
-      setTitle("");
-      setStudent("");
-      setTutor("");
-      setNotes("");
-      setSelectedSlot(null);
-      setSelectedEvent(null);
-      setIsEditing(false);
-      setOpen(false);
-    }}
-  >
-    {isEditing ? "Save" : "Add"}
-  </Button>
-</DialogActions>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    if (!selectedSlot || !title) return;
+
+                    const start = selectedSlot.start;
+                    const end = selectedSlot.end;
+
+                    // 8 AM to 8 PM check
+                    if (start.getHours() < 8 || end.getHours() > 20) {
+                      alert("Sessions must be between 8 AM and 8 PM");
+                      return;
+                    }
+
+                    // 15-minute intervals
+                    const validMinutes = [0, 15, 30, 45];
+                    if (
+                      !validMinutes.includes(start.getMinutes()) ||
+                      !validMinutes.includes(end.getMinutes())
+                    ) {
+                      alert("Time must be in 15-minute intervals (00, 15, 30, 45)");
+                      return;
+                    }
+
+                    if (isEditing && selectedEvent) {
+                      fetch(`http://127.0.0.1:5000/api/sessions/${selectedEvent.id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          subjects: title,
+                          startDateTime: start.toISOString().slice(0, 19).replace("T", " "),
+                          endDateTime: end.toISOString().slice(0, 19).replace("T", " "),
+                          location: "online",
+                        }),
+                      }).then(() => window.location.reload());
+                    } else {
+                      fetch("http://127.0.0.1:5000/api/sessions", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          tutorId: tutor,
+                          studentId: student,
+                          subjects: title,
+                          startDateTime: start.toISOString().slice(0, 19).replace("T", " "),
+                          endDateTime: end.toISOString().slice(0, 19).replace("T", " "),
+                          location: "online",
+                        }),
+                      }).then(() => window.location.reload());
+                    }
+                  }}
+                >
+                  {isEditing ? "Save" : "Add"}
+                </Button>
+              </>
+            )}
+          </DialogActions>
         </Dialog>
       </Box>
     </Container>
