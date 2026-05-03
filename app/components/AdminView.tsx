@@ -63,13 +63,13 @@ export default function AdminView() {
             label: "Tutors",
             icon: PeopleAltIcon,
             info: "View and manage tutor profiles",
-            path: "/tutorInfo"
+            path: "/tutorOverview"
         },
         {
             label: "Students",
             icon: BackpackIcon,
             info: "View and manage student profiles",
-            path: "/studentInfo"
+            path: "/studentOverview"
         }
     ];
 
@@ -86,9 +86,9 @@ export default function AdminView() {
                         <Grid size={{ xs: 1, md: 4 }} key={stat.label}>
                             <Card sx={{ height: '100%', borderRadius: 2, boxShadow: 4, transition: '0.3s', '&:hover': { boxShadow: 12 } }}>
                                 <CardContent sx={{ pt: 3 }}>
-                                    {/* MIGHT ADD BACK:  <Box sx={{ p: 1.75, borderRadius: 3, backgroundColor: 'secondary.dark', display: 'inline-flex', mb: 2 }}>
+                                     <Box sx={{ p: 1.75, borderRadius: 3, backgroundColor: 'secondary.dark', display: 'inline-flex', mb: 2 }}>
                                         <stat.icon fontSize="medium" sx={{ color: 'white' }} />
-                                    </Box> */}
+                                    </Box> 
                                     <Typography variant="h6" sx={{ mb: 0.4, fontWeight: 600, color: 'text.primary' }}>
                                         {loading ? "Loading..." : stat.value}
                                     </Typography>

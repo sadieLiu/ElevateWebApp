@@ -46,7 +46,7 @@ const StudentInfoPage: React.FC = () => {
                 Student Directory
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 5, fontSize: '1.3rem', fontWeight: 500 }}>
-                Manage and view your student's profiles.
+               View student profiles.
             </Typography>
 
             <Grid container spacing={4}>

@@ -44,7 +44,7 @@ const TutorInfoPage: React.FC = () => {
                 Tutor Directory
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 5, fontSize: '1.3rem', fontWeight: 500 }}>
-                Manage and view your tutor's profiles.
+               View tutor profiles.
             </Typography>
 
             <Grid container spacing={4}>
