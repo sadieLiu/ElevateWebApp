@@ -388,7 +388,7 @@ def get_dashboard_stats(userId, role):
             stats['upcomingSessions'] = cursor.fetchall()
 
             cursor.execute("""
-            SELECT COUNT(DISTINCT studentId) AS total
+            SELECT COUNT(DISTINCT sr.studentId) AS total
             FROM SessionReport sr
             JOIN Session s ON sr.sessionId = s.sessionId
             WHERE s.tutorId = %s
@@ -412,7 +412,7 @@ def get_dashboard_stats(userId, role):
             stats['upcomingSessions'] = cursor.fetchall()
 
             cursor.execute("""
-            SELECT COUNT(DISTINCT subjects) AS total
+            SELECT COUNT(DISTINCT s.subjects) AS total
             FROM Session s
             JOIN SessionReport ss ON s.sessionId = ss.sessionId
             WHERE ss.studentId = %s
