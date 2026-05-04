@@ -16,6 +16,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
 } from "@mui/material";
 
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
@@ -35,7 +36,6 @@ const localizer = dateFnsLocalizer({
 
 const parseMySQLDate = (value: string) => {
   const date = new Date(value);
-
   return new Date(
     date.getUTCFullYear(),
     date.getUTCMonth(),
@@ -59,10 +59,31 @@ const toMySQLFormat = (date: Date) => {
 };
 
 const timeOptions = [
-  "08:00","08:30","09:00","09:30","10:00","10:30",
-  "11:00","11:30","12:00","12:30","13:00","13:30",
-  "14:00","14:30","15:00","15:30","16:00","16:30",
-  "17:00","17:30","18:00","18:30","19:00","19:30","20:00",
+  { value: "08:00", label: "8:00 AM" },
+  { value: "08:30", label: "8:30 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "09:30", label: "9:30 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "10:30", label: "10:30 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "11:30", label: "11:30 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "12:30", label: "12:30 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "13:30", label: "1:30 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "14:30", label: "2:30 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "15:30", label: "3:30 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "16:30", label: "4:30 PM" },
+  { value: "17:00", label: "5:00 PM" },
+  { value: "17:30", label: "5:30 PM" },
+  { value: "18:00", label: "6:00 PM" },
+  { value: "18:30", label: "6:30 PM" },
+  { value: "19:00", label: "7:00 PM" },
+  { value: "19:30", label: "7:30 PM" },
+  { value: "20:00", label: "8:00 PM" },
 ];
 
 const getTimeValue = (date: Date) => {
@@ -132,27 +153,28 @@ export default function TutorCalendar({ allowScheduling = false }) {
       <Box sx={{ mt: 6 }}>
         <Typography variant="h4">Tutoring Schedule</Typography>
 
-        {allowScheduling && (
-          <Button
-            variant="contained"
-            sx={{ mb: 2 }}
-            onClick={() => {
-              setIsEditing(false);
-              setSelectedEvent(null);
-              setTitle("");
-              setStudent("");
-              setTutor("");
-              setNotes("");
-              setSelectedSlot({
-                start: new Date(),
-                end: new Date(new Date().getTime() + 60*60*1000),
-              });
-              setOpen(true);
-            }}
-          >
-            Add Session
-          </Button>
-        )}
+       {allowScheduling && (
+  <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+    <Button
+      variant="contained"
+      onClick={() => {
+        setIsEditing(false);
+        setSelectedEvent(null);
+        setTitle("");
+        setStudent("");
+        setTutor("");
+        setNotes("");
+        setSelectedSlot({
+          start: new Date(),
+          end: new Date(new Date().getTime() + 60*60*1000),
+        });
+        setOpen(true);
+      }}
+    >
+      Add Session
+    </Button>
+  </Box>
+)}
 
         <Paper sx={{ height: 600, p: 2 }}>
           <Calendar
@@ -164,9 +186,8 @@ export default function TutorCalendar({ allowScheduling = false }) {
             step={30}
             timeslots={2}
             onSelectEvent={(event) => {
-              if (!allowScheduling) return;
               setSelectedEvent(event);
-              setIsEditing(true);
+              setIsEditing(allowScheduling);
               setTitle(event.title);
               setStudent(event.student);
               setTutor(event.tutor);
@@ -193,76 +214,131 @@ export default function TutorCalendar({ allowScheduling = false }) {
           />
         </Paper>
 
-        <Dialog open={open && allowScheduling} onClose={() => setOpen(false)}>
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          fullWidth
+          maxWidth="md"
+        >
           <DialogTitle>
             {isEditing ? "Edit Tutoring Session" : "Add Tutoring Session"}
           </DialogTitle>
 
           <DialogContent>
-            {selectedSlot && (
-              <Box sx={{ mb: 2 }}>
-                <Typography>Start: {selectedSlot.start.toLocaleString()}</Typography>
-                <Typography>End: {selectedSlot.end.toLocaleString()}</Typography>
-              </Box>
-            )}
+            <Stack spacing={2}>
 
-            <FormControl fullWidth margin="dense">
-              <InputLabel>Start Time</InputLabel>
+              {selectedSlot && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography>Start: {selectedSlot.start.toLocaleString()}</Typography>
+                  <Typography>End: {selectedSlot.end.toLocaleString()}</Typography>
+                </Box>
+              )}
+
+              <FormControl
+                  fullWidth
+                  margin="dense"
+                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                >
+                <InputLabel>Start Time</InputLabel>
+                <Select
+                  disabled={!allowScheduling}
+                  value={selectedSlot ? getTimeValue(selectedSlot.start) : ""}
+                  label="Start Time"
+                  onChange={(e) => {
+                    if (!selectedSlot) return;
+                    setSelectedSlot((prev) =>
+                      prev ? { ...prev, start: setTimeOnDate(prev.start, e.target.value) } : null
+                    );
+                  }}
+                >
+                  {timeOptions.map((time) => (
+                   <MenuItem key={time.value} value={time.value}>
+                    {time.label}
+                  </MenuItem>
+                ))}
+                </Select>
+              </FormControl>
+
+              <FormControl
+                  fullWidth
+                  margin="dense"
+                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                >
+                <InputLabel>End Time</InputLabel>
+                <Select
+                  disabled={!allowScheduling}
+                  value={selectedSlot ? getTimeValue(selectedSlot.end) : ""}
+                  label="End Time"
+                  onChange={(e) => {
+                    if (!selectedSlot) return;
+                    setSelectedSlot((prev) =>
+                      prev ? { ...prev, end: setTimeOnDate(prev.end, e.target.value) } : null
+                    );
+                  }}
+                >
+                  {timeOptions.map((time) => (
+                    <MenuItem key={time.value} value={time.value}>
+                      {time.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <TextField
+                label="Session Title"
+                fullWidth
+                disabled={!allowScheduling}
+                  value={title}
+                  onChange={(e)=>setTitle(e.target.value)}
+                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                />
+
+              <FormControl
+                  fullWidth
+                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                >
+                  <InputLabel id="student-label">Student</InputLabel>
+                  <Select
+                    disabled={!allowScheduling}
+                    labelId="student-label"
+                    label="Student"
+                    value={student}
+                    onChange={(e)=>setStudent(Number(e.target.value))}
+                  >
+                    {students.map((s:any)=>(
+                      <MenuItem key={s.studentId} value={s.studentId}>{s.name}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+              <FormControl
+              fullWidth
+              sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+            >
+              <InputLabel id="tutor-label">Tutor</InputLabel>
               <Select
-                value={selectedSlot ? getTimeValue(selectedSlot.start) : ""}
-                label="Start Time"
-                onChange={(e) => {
-                  if (!selectedSlot) return;
-                  setSelectedSlot((prev) =>
-                    prev ? { ...prev, start: setTimeOnDate(prev.start, e.target.value) } : null
-                  );
-                }}
+                disabled={!allowScheduling}
+                labelId="tutor-label"
+                label="Tutor"
+                value={tutor}
+                onChange={(e)=>setTutor(Number(e.target.value))}
               >
-                {timeOptions.map((time) => (
-                  <MenuItem key={time} value={time}>{time}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth margin="dense">
-              <InputLabel>End Time</InputLabel>
-              <Select
-                value={selectedSlot ? getTimeValue(selectedSlot.end) : ""}
-                label="End Time"
-                onChange={(e) => {
-                  if (!selectedSlot) return;
-                  setSelectedSlot((prev) =>
-                    prev ? { ...prev, end: setTimeOnDate(prev.end, e.target.value) } : null
-                  );
-                }}
-              >
-                {timeOptions.map((time) => (
-                  <MenuItem key={time} value={time}>{time}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <TextField label="Session Title" fullWidth value={title} onChange={(e)=>setTitle(e.target.value)} />
-
-            <FormControl fullWidth>
-              <InputLabel>Student</InputLabel>
-              <Select value={student} onChange={(e)=>setStudent(Number(e.target.value))}>
-                {students.map((s:any)=>(
-                  <MenuItem key={s.studentId} value={s.studentId}>{s.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth>
-              <InputLabel>Tutor</InputLabel>
-              <Select value={tutor} onChange={(e)=>setTutor(Number(e.target.value))}>
                 {tutors.map((t:any)=>(
                   <MenuItem key={t.tutorId} value={t.tutorId}>{t.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <TextField label="Notes" fullWidth multiline value={notes} onChange={(e)=>setNotes(e.target.value)} />
+              <TextField
+                label="Notes"
+                fullWidth
+                multiline
+                disabled={!allowScheduling}
+                value={notes}
+                onChange={(e)=>setNotes(e.target.value)}
+                sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+              />
+            </Stack>
           </DialogContent>
 
           <DialogActions>
