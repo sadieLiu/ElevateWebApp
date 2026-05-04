@@ -48,7 +48,7 @@ export default function TutorView() {
         },
         {
             label: "Total Hours Tutored",
-            value: (stats?.totalSessions * 4) || 0,
+            value: (stats?.totalSessions * 2) || 0, // assume each session is 2 hrs
             icon: WatchLaterIcon
         }
     ];
