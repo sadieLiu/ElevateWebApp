@@ -12,8 +12,6 @@ export default function Login() {
   const [userName, setUserName] = useState("");
   const [passwordHash, setPassword] = useState("");
   const [error, setError] = useState("");
-  export default function TutorCalendar({ allowScheduling = false }) {
-  const { user } = useAuth();
 
 
   if (isLoading) {
