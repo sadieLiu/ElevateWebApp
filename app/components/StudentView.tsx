@@ -132,12 +132,13 @@ export default function StudentView() {
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                                                     <WatchLaterIcon fontSize="small" sx={{ color: 'gray', fontSize: 16 }} />
                                                     <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                        {new Date(session.startDateTime).toLocaleString("en-US", {
+                                                        {new Date(session.startDateTime.toString().replace('GMT', '')).toLocaleString("en-US", {
                                                             weekday: 'long',
                                                             month: 'short',
                                                             day: 'numeric',
                                                             hour: 'numeric',
-                                                            minute: 'numeric'
+                                                            minute: 'numeric',
+                                                            hour12: true
                                                         })}
                                                     </Typography>
                                                 </Box>
