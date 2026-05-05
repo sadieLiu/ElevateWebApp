@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from db import get_db_connection
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -56,6 +57,9 @@ def add_student():
         conn.commit()
         return jsonify({"message": "student added", "studentId": user_id})
 
+    except Exception as e:
+        conn.rollback()
+        raise e
     except Exception as e:
         conn.rollback()
         raise e
@@ -143,63 +147,60 @@ def update_student(id):
             conn.rollback()
             raise e
 
-      finally:
-            cursor.close()
-            conn.close()
+    finally:
+        cursor.close()
+        conn.close()
 
 # Delete Student Function
 @app.route('/api/students/<int:id>', methods=['DELETE'])
 def delete_student(id):
-      conn = get_db_connection()
-      cursor = conn.cursor()
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-      cursor.execute('DELETE FROM Student WHERE studentId = %s', (id,))
-      conn.commit()
+    cursor.execute('DELETE FROM Student WHERE studentId = %s', (id,))
+    conn.commit()
 
-      cursor.execute('DELETE FROM User WHERE userId = %s', (id,))
-      conn.commit()
+    cursor.close()
+    conn.close()
 
-      cursor.close()
-      conn.close()
-
-      return jsonify({"message": "student deleted"})
+    return jsonify({"message": "student deleted"})
 
 @app.route('/api/students/<int:id>', methods=['GET'])
 def get_student_by_id(id):
-      conn = get_db_connection()
-      cursor = conn.cursor(dictionary=True)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-      cursor.execute('SELECT * FROM Student WHERE studentId = %s', (id,))
-      student = cursor.fetchone()
+    cursor.execute('SELECT * FROM Student WHERE studentId = %s', (id,))
+    student = cursor.fetchone()
 
-      cursor.close()
-      conn.close()
+    cursor.close()
+    conn.close()
 
-      if student:
-            return jsonify(student)
+    if student:
+        return jsonify(student)
 
-      return jsonify({"message": "student not found"}), 404
+    return jsonify({"message": "student not found"}), 404
 
 # LOGIN ROUTE
 @app.route('/api/login', methods=['POST'])
 def login():
-      data = request.get_json()
-      conn = get_db_connection()
-      cursor = conn.cursor(dictionary=True)
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-      cursor.execute(
-            'SELECT userId, userName, role FROM User WHERE userName = %s AND passwordHash = %s',
-            (data['userName'], data['passwordHash'])
-      )
+    cursor.execute(
+        'SELECT userId, userName, role FROM User WHERE userName = %s AND passwordHash = %s',
+        (data['userName'], data['passwordHash'])
+    )
 
-      user = cursor.fetchone()
-      cursor.close()
-      conn.close()
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
 
-      if user:
-            return jsonify(user), 200
-
-      return jsonify({"message": "Invalid credentials"}), 401
+    if user:
+        return jsonify(user), 200
+    else:
+          return jsonify({"message": "Invalid credentials"}), 401
 
 # TUTOR ROUTES
 
@@ -364,6 +365,16 @@ def get_sessions():
 @app.route('/api/sessions', methods=['POST'])
 def add_session():
     data = request.get_json()
+
+    start = datetime.strptime(data['startDateTime'], "%Y-%m-%d %H:%M:%S")
+    end = datetime.strptime(data['endDateTime'], "%Y-%m-%d %H:%M:%S")
+
+    if start.hour < 8 or end.hour > 20 or (end.hour == 20 and end.minute > 0):
+        return jsonify({"message": "Sessions must be between 8 AM and 8 PM"}), 400
+
+    if start.minute not in [0, 30] or end.minute not in [0, 30]:
+        return jsonify({"message": "Sessions must start and end on 30-minute intervals"}), 400
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -413,6 +424,15 @@ def add_session():
 @app.route('/api/sessions/<int:id>', methods=['PUT'])
 def update_session(id):
     data = request.get_json()
+    start = datetime.strptime(data['startDateTime'], "%Y-%m-%d %H:%M:%S")
+    end = datetime.strptime(data['endDateTime'], "%Y-%m-%d %H:%M:%S")
+
+    if start.hour < 8 or end.hour > 20 or (end.hour == 20 and end.minute > 0):
+        return jsonify({"message": "Sessions must be between 8 AM and 8 PM"}), 400
+
+    if start.minute not in [0, 30] or end.minute not in [0, 30]:
+        return jsonify({"message": "Sessions must start and end on 30-minute intervals"}), 400
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -530,7 +550,7 @@ def get_dashboard_stats(userId, role):
             stats['upcomingSessions'] = cursor.fetchall()
 
             cursor.execute("""
-            SELECT COUNT(DISTINCT studentId) AS total
+            SELECT COUNT(DISTINCT sr.studentId) AS total
             FROM SessionReport sr
             JOIN Session s ON sr.sessionId = s.sessionId
             WHERE s.tutorId = %s
@@ -554,7 +574,7 @@ def get_dashboard_stats(userId, role):
             stats['upcomingSessions'] = cursor.fetchall()
 
             cursor.execute("""
-            SELECT COUNT(DISTINCT subjects) AS total
+            SELECT COUNT(DISTINCT s.subjects) AS total
             FROM Session s
             JOIN SessionReport ss ON s.sessionId = ss.sessionId
             WHERE ss.studentId = %s
