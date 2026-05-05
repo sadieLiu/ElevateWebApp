@@ -9,6 +9,8 @@ import { EnhancedTableRows } from "./EnhancedTableRows";
 import { getComparator } from "./tableUtility";
 import { Data, Order } from "./tableTypes";
 import { FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
+//import { revalidatePath } from "next/cache";
+
 
 export default function EnhancedTable() {
 
@@ -37,15 +39,12 @@ React.useEffect(() => {
 }, []);
 
 //tutor subjects funtionality
-const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const subject = event.target.name;
+const [mathBool,setMathBool] = React.useState(false);
+const [englishBool,setEnglishBool] = React.useState(false);
+const [scienceBool,setScienceBool] = React.useState(false);
+const [historyBool,setHistoryBool] = React.useState(false);
 
-  setSelectedSubjects(prev =>
-    event.target.checked
-      ? [...prev, subject]                 // add subject
-      : prev.filter(s => s !== subject)    // remove subject
-  );
-};
+
 
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("name");
@@ -53,6 +52,22 @@ const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  //edit tutor modal
+  const [openEditModal, setOpenEditModal] = React.useState(false);
+  const [editingTutor, setEditingTutor] = React.useState<Data | null>(null);
+  const [editedUserName, setEditedUserName] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+  if (editingTutor && editingTutor.subjects) {
+    const subjectsStr = editingTutor.subjects || "";
+    
+    setMathBool(subjectsStr.includes("Math"));
+    setEnglishBool(subjectsStr.includes("English"));
+    setScienceBool(subjectsStr.includes("Science"));
+    setHistoryBool(subjectsStr.includes("History"));
+  }
+}, [editingTutor]);
 
   const visibleRows = React.useMemo(
     () =>
@@ -71,6 +86,16 @@ const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   const [newBirthday, setNewBirthday] = React.useState("")
   const [newSubjects, setNewSubjects] = React.useState("")
   const [newAvailability, setNewAvailability] = React.useState("")
+  const handleSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const subject = e.target.name;
+  const checked = e.target.checked;
+
+  setSelectedSubjects(prev =>
+    checked
+      ? [...prev, subject]
+      : prev.filter(s => s !== subject)
+  );
+};
 
   //delete functionality
   async function handleDeleteSelected() {
@@ -86,10 +111,39 @@ const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   // Clear selection
   setSelected([]);
 }
+//edit functionality
+async function handleEditTutor(id: number) {
+  const res = await fetch (`http://127.0.0.1:5000/api/tutors/${id}`);
+  const data = await res.json();
 
+  setEditingTutor(data);
+  setOpenEditModal(true);
+}
+
+async function handleUpdateTutor(id: number, updatedTutor: any) {
+  await fetch(`http://127.0.0.1:5000/api/tutors/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedTutor)
+  });
+  setOpenEditModal(false);
+  setEditingTutor(null);
+
+  //refresh table
+  const res = await fetch("http://127.0.0.1:5000/api/tutors");
+  const updated = await res.json();
+  setRows(updated.map((tutor:any) => ({
+    id: tutor.tutorId,
+    userName: tutor.userName,
+    name: tutor.name,
+    birthday: tutor.birthday,
+    subjects: tutor.subjects ? tutor.subjects.split(',').join(', ') : "",
+    availability: tutor.availability
+  })));
+}
 // add  functionality
 async function handleAddTutor() {
-  const subjectString = selectedSubjects.join (", "); //concat subjects into a single string
+  const subjectStr = selectedSubjects.join (", "); //concat subjects into a single string
   await fetch("http://127.0.0.1:5000/api/tutors", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -98,10 +152,16 @@ async function handleAddTutor() {
       passwordHash: newPasswordHash,
       name: newName,
       birthday: newBirthday,
-      subjects: subjectString,
+      subjects: subjectStr,
       availability: newAvailability,
     }),
   });
+
+  const payload = {
+  ...editingTutor,
+  subjects: subjectStr
+};
+
 
   // Refresh table
   const res = await fetch("http://127.0.0.1:5000/api/tutors");
@@ -157,6 +217,7 @@ async function handleAddTutor() {
 
                   setSelected(newSelected);
                 }}
+                onEdit={handleEditTutor}
                 dense={dense}
               />
             </TableBody>
@@ -187,7 +248,7 @@ async function handleAddTutor() {
     onClose={() => setOpenAddModal(false)}
     sx={{
       "& .MuiInputBase-input:focus": {
-        color: "#ACDDDE", // or any color you want
+        color: "#ACDDDE", 
       },
       "& label.Mui-focused": {
         color: "#ACDDDE",
@@ -255,6 +316,15 @@ async function handleAddTutor() {
             <Checkbox name="Math" 
             checked={selectedSubjects.includes("Math")} 
             onChange={handleSubjectChange} 
+            sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
             />
           } label="Math"
         />
@@ -263,6 +333,15 @@ async function handleAddTutor() {
             <Checkbox name="English" 
             checked={selectedSubjects.includes("English")} 
             onChange={handleSubjectChange} 
+              sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
             />
           } label="English"
         />
@@ -271,6 +350,15 @@ async function handleAddTutor() {
             <Checkbox name="Science" 
             checked={selectedSubjects.includes("Science")} 
             onChange={handleSubjectChange} 
+              sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
             />
           } label="Science"
         />
@@ -279,6 +367,15 @@ async function handleAddTutor() {
             <Checkbox name="History" 
             checked={selectedSubjects.includes("History")} 
             onChange={handleSubjectChange} 
+              sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
             />
           } label="History"
         />
@@ -297,7 +394,176 @@ async function handleAddTutor() {
     <Button variant = 'contained' color = 'primary' onClick={handleAddTutor}>Add</Button>
   </DialogActions>
 </Dialog>
+      
+  <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}
+        sx={{
+          "& .MuiInputBase-input:focus": {
+            color: "#ACDDDE",
+          },
+          "& label.Mui-focused": {
+          color: "#ACDDDE",
+        },
+        }}>
+  <DialogTitle>Edit Tutor</DialogTitle>
+  <DialogContent>
 
-    </Box>
+    <TextField
+      margin="dense"
+      label="Username"
+      fullWidth
+      value={editingTutor?.userName || ""}
+      onChange={(e) =>
+        setEditingTutor((prev) => prev ? { ...prev, userName: e.target.value } : null)
+      }
+    />
+
+    <TextField
+      margin="dense"
+      label="Password"
+      fullWidth
+      value={editingTutor?.passwordHash || ""}
+      onChange={(e) =>
+        setEditingTutor((prev) => prev ? { ...prev, passwordHash: e.target.value } : null)
+      }
+
+    />
+
+    <TextField
+      margin="dense"
+      label="Name"
+      fullWidth
+      value={editingTutor?.name || ""}
+      onChange={(e) =>
+        setEditingTutor((prev) => prev ? { ...prev, name: e.target.value } : null)
+      }
+
+    />
+
+    <TextField
+      margin="dense"
+      label="Birthday"
+      fullWidth
+      value={editingTutor?.birthday || ""}
+      onChange={(e) => {
+          // Ensure the date is in YYYY-MM-DD format
+          let v = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+
+          //add formatting dashes as user types
+          if (v.length >= 5) v = v.slice(0,4) + "-" + v.slice(4);
+          if (v.length >= 8) v = v.slice(0,7) + "-" + v.slice(7);
+
+          //validates that values are in correct ranges for month and day
+          // if not it sets it to a valid range
+          const [year, month, day] = v.split("-").map(Number);
+          if (year > CURRYEAR) v = CURRYEAR + v.slice(4);
+          if (month > 12) v = v.slice(0,5) + "12" + v.slice(7);
+          if (day > 31) v = v.slice(0,8) + "31";
+        
+        setEditingTutor(prev => prev ? { ...prev, birthday: v } : null);
+      }}
+
+    />
+      <FormControl fullWidth margin="dense">
+        <FormControlLabel 
+          control={
+            <Checkbox name="Math" 
+            checked={mathBool} 
+            onChange={(e) => setMathBool(e.target.checked)}
+            sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
+            />
+          } label="Math"
+        />
+        <FormControlLabel 
+          control={
+            <Checkbox name="English" 
+            checked={englishBool} 
+            onChange={(e) => setEnglishBool(e.target.checked)}
+            sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
+            />
+          } label="English"
+        />
+        <FormControlLabel 
+          control={
+            <Checkbox name="Science" 
+            checked={scienceBool} 
+            onChange={(e) => setScienceBool(e.target.checked)}
+            sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
+            />
+          } label="Science"
+        />
+        <FormControlLabel 
+          control={
+            <Checkbox name="History" 
+            checked={historyBool} 
+            onChange={(e) => setHistoryBool(e.target.checked)}
+            sx={{
+
+              "&.Mui-checked": {
+                color: "#ACDDDE"
+              },
+              "& .MuiTouchRipple-root span": {
+                backgroundColor: "#90caf9"
+              }
+            }}
+            />
+          } label="History"
+        />
+    </FormControl>
+
+    <TextField
+      margin="dense"
+      label="Availability"
+      fullWidth
+      value={editingTutor?.availability || ""}
+      onChange={(e) =>
+        setEditingTutor((prev) => prev ? { ...prev, availability: e.target.value } : null)
+      }
+    />
+</DialogContent>
+    <DialogActions>
+        <Button variant = 'contained' color = 'primary' onClick={() => setOpenEditModal(false)}>Cancel</Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            if (!editingTutor || !editingTutor.tutorId) return; 
+            const subjectList: string[] = [];  
+                    if (mathBool) subjectList.push("Math");
+                    if (englishBool) subjectList.push("English");
+                    if (scienceBool) subjectList.push("Science");
+                    if (historyBool) subjectList.push("History");
+                    const subjectStr = subjectList.join(", ");
+            const updatedTutor = { ...editingTutor, subjects: subjectStr };
+                    handleUpdateTutor(editingTutor.tutorId, updatedTutor);
+          }}>
+          Save
+      </Button>
+    </DialogActions>
+  </Dialog>
+
+  </Box>
   );
 }

@@ -1,6 +1,10 @@
 // data types for tables and interface
 
 export interface Data {
+  userId: number;
+  tutorId: number;
+  userName: string;
+  passwordHash: string;
   id: number;
   name: string;
   subjects: string;

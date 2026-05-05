@@ -7,10 +7,10 @@ interface EnhancedTableRowsProps {
   rows: Data[];
   selected: readonly number[];
   onRowClick: (event: React.MouseEvent<unknown>, id: number) => void;
+  onEdit: (id: number) => void;
   dense: boolean;
 }
 
-//format birthday
 const formatDate = (dateString: string) => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -25,6 +25,7 @@ export function EnhancedTableRows({
   rows,
   selected,
   onRowClick,
+  onEdit,
   dense
 }: EnhancedTableRowsProps) {
   return (
@@ -51,8 +52,27 @@ export function EnhancedTableRows({
                 inputProps={{ "aria-labelledby": labelId }}
               />
             </TableCell>
+            <TableCell
+              component="th"
+              id={labelId}
+              scope="row"
+              padding="none"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(row.id);
+              }}
+              sx={{
+                cursor: "pointer",
+                color: "#000000",
+                "&:hover": {
+                  color: "#1976d2",
+                  fontWeight: 600
+                }
+              }}
+            >
+              {row.name}
+            </TableCell>
 
-            <TableCell component="th" id={labelId} scope="row" padding="none">{row.name} </TableCell>
             <TableCell align="right">{row.grade}</TableCell>
             <TableCell align="right">{row.school}</TableCell>
             <TableCell align="right">{formatDate(row.birthday)}</TableCell>

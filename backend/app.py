@@ -64,30 +64,81 @@ def add_student():
         cursor.close()
         conn.close()
 
-# Update student
+# edit and update student
+@app.route('/api/students/<int:id>', methods=['GET'])
+def edit_student(id):
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
+
+      #Get existing studentinfo
+      cursor.execute("""SELECT 
+            u.userId, 
+            u.userName, 
+            u.passwordHash, 
+            s.studentId,
+            s.name, 
+            s.birthday, 
+            s.grade, 
+            s.school,
+            s.parentName,
+            s.parentPhone,
+            s.parentEmail,
+            s.location
+            FROM User u 
+            JOIN Student s ON u.userId = s.studentId 
+            WHERE s.studentId = %s""", (id,))
+           
+      student = cursor.fetchone()
+      cursor.close()
+      conn.close()
+
+      if not student:
+            return jsonify({"message": "student not found"}), 404
+      
+      if student['birthday']:
+            student['birthday'] = student['birthday'].strftime("%Y-%m-%d")
+
+      return jsonify(student)
 @app.route('/api/students/<int:id>', methods=['PUT'])
 def update_student(id):
       data = request.get_json()
       conn = get_db_connection()
       cursor = conn.cursor()
 
-      #Get existing studentinfo
-      cursor.execute('SELECT userName, passwordHash, name, birthday, grade, location FROM User WHERE userId = %s', (id,))
-      existing_user = cursor.fetchone()
-      if not existing_user:
-            cursor.close()
-            conn.close()
-            return jsonify({"message": "student not found"}), 404
-
-      # Update student table
       try:
-            cursor.execute(
-                  'UPDATE User SET userName = %s, passwordHash = %s, name = %s, birthday = %s, grade = %s, location = %s WHERE userId = %s',
-                  (data['userName'], data['passwordHash'], data['name'], data['birthday'], data['grade'], data['location'], id)
-            )
+        # Update User table
+            cursor.execute("""
+                  UPDATE User 
+                  SET userName = %s, 
+                  passwordHash = %s
+                  WHERE userId = %s
+            """, (data['userName'], data['passwordHash'], id))
+
+            # Update Student table
+            cursor.execute("""
+                  UPDATE Student
+                        SET name = %s, 
+                        birthday = %s, 
+                        grade = %s, 
+                        school = %s,
+                        location = %s, 
+                        parentName = %s, 
+                        parentPhone = %s, 
+                        parentEmail = %s
+                  WHERE studentId = %s """, (
+                  data['name'], 
+                  data['birthday'], 
+                  data['grade'], 
+                  data['school'],
+                  data['location'], 
+                  data['parentName'], 
+                  data['parentPhone'], 
+                  data['parentEmail'], id
+            ))
+
             conn.commit()
             return jsonify({"message": "student updated"})
-
+       
       except Exception as e:
             conn.rollback()
             raise e
@@ -148,7 +199,7 @@ def login():
       if user:
             return jsonify(user), 200
 
-    return jsonify({"message": "Invalid credentials"}), 401
+      return jsonify({"message": "Invalid credentials"}), 401
 
 # TUTOR ROUTES
 
@@ -164,7 +215,7 @@ def get_tutors():
     conn.close()
 
     return jsonify(tutors)
-
+#add tutor
 @app.route('/api/tutors', methods=['POST'])
 def add_tutor():
     data = request.get_json()
@@ -216,6 +267,82 @@ def delete_tutor(id):
     conn.close()
 
     return jsonify({"message": "tutor deleted"})
+
+    
+# edit and update tutor
+@app.route('/api/tutors/<int:id>', methods=['GET'])
+def edit_tutor(id):
+      conn = get_db_connection()
+      cursor = conn.cursor(dictionary=True)
+
+      #Get existing tutorinfo
+      cursor.execute("""SELECT 
+            u.userId, 
+            u.userName, 
+            u.passwordHash, 
+            t.tutorId,
+            t.name, 
+            t.birthday, 
+            t.isAdmin,
+            t.subjects,
+            t.availability
+            FROM User u 
+            JOIN Tutor t ON u.userId = t.tutorId 
+            WHERE t.tutorId = %s""", (id,))
+           
+      tutor = cursor.fetchone()
+      cursor.close()
+      conn.close()
+
+      if not tutor:
+            return jsonify({"message": "tutor not found"}), 404
+      
+      if tutor['birthday']:
+            tutor['birthday'] = tutor['birthday'].strftime("%Y-%m-%d")
+
+      return jsonify(tutor)
+          
+@app.route('/api/tutors/<int:id>', methods=['PUT'])
+def update_tutor(id):
+      data = request.get_json()
+      conn = get_db_connection()
+      cursor = conn.cursor()
+
+      try:
+        # Update User table
+            cursor.execute("""
+                  UPDATE User 
+                  SET userName = %s, 
+                  passwordHash = %s
+                  WHERE userId = %s
+            """, (data['userName'], data['passwordHash'], id))
+
+            # Update tutor table
+            cursor.execute("""
+                  UPDATE Tutor
+                        SET name = %s, 
+                        birthday = %s, 
+                        isAdmin = %s,
+                        subjects = %s,
+                        availability = %s
+                  WHERE tutorId = %s """, (
+                  data['name'], 
+                  data['birthday'], 
+                  data['isAdmin'],
+                  data['subjects'],
+                  data['availability'], id
+            ))
+
+            conn.commit()
+            return jsonify({"message": "tutor updated"})
+       
+      except Exception as e:
+            conn.rollback()
+            raise e
+
+      finally:
+            cursor.close()
+            conn.close()
 
 # SESSION ROUTES
 

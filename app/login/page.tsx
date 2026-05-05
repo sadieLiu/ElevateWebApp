@@ -13,7 +13,6 @@ export default function Login() {
   const [passwordHash, setPassword] = useState("");
   const [error, setError] = useState("");
 
-
   if (isLoading) {
     return <Typography variant="h5" align="center" sx={{ mt: 4 }}>Loading Page...</Typography>;
   }
