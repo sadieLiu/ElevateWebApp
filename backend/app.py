@@ -105,11 +105,11 @@ def edit_student(id):
       return jsonify(student)
 @app.route('/api/students/<int:id>', methods=['PUT'])
 def update_student(id):
-      data = request.get_json()
-      conn = get_db_connection()
-      cursor = conn.cursor()
+    data = request.get_json()
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-      try:
+    try:
         # Update User table
             cursor.execute("""
                   UPDATE User 
@@ -120,7 +120,7 @@ def update_student(id):
 
             # Update Student table
             cursor.execute("""
-                  UPDATE Student
+                    UPDATE Student
                         SET name = %s, 
                         birthday = %s, 
                         grade = %s, 
@@ -129,23 +129,25 @@ def update_student(id):
                         parentName = %s, 
                         parentPhone = %s, 
                         parentEmail = %s
-                  WHERE studentId = %s """, (
-                  data['name'], 
-                  data['birthday'], 
-                  data['grade'], 
-                  data['school'],
-                  data['location'], 
-                  data['parentName'], 
-                  data['parentPhone'], 
-                  data['parentEmail'], id
+                    WHERE studentId = %s 
+                """, (
+                    data['name'], 
+                    data['birthday'], 
+                    data['grade'], 
+                    data['school'],
+                    data['location'], 
+                    data['parentName'], 
+                    data['parentPhone'], 
+                    data['parentEmail'], 
+                    id
             ))
 
             conn.commit()
             return jsonify({"message": "student updated"})
        
-      except Exception as e:
-            conn.rollback()
-            raise e
+    except Exception as e:
+        conn.rollback()
+        raise e
 
     finally:
         cursor.close()
