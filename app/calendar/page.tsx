@@ -97,6 +97,20 @@ const setTimeOnDate = (date: Date, time: string) => {
   return updated;
 };
 
+const setDateOnly = (originalDate: Date, newDateString: string) => {
+  const [year, month, day] = newDateString.split("-").map(Number);
+  const updated = new Date(originalDate);
+  updated.setFullYear(year, month - 1, day);
+  return updated;
+};
+
+const inputStyle = {
+  backgroundColor: "#e8f0fe",
+  borderRadius: 1,
+  "& .MuiInputBase-input": { color: "rgba(0, 0, 0, 0.87)" },
+  "& .MuiInputLabel-root": { color: "rgba(0, 0, 0, 0.6)" },
+};
+
 interface EventType {
   id: number;
   title: string;
@@ -164,9 +178,17 @@ export default function TutorCalendar({ allowScheduling = false }) {
         setStudent("");
         setTutor("");
         setNotes("");
+
+        const defaultStart = new Date();
+        defaultStart.setHours(8,0,0,0);
+        defaultStart.setMinutes(0, 0, 0);
+
+        const defaultEnd = new Date(defaultStart);
+        defaultEnd.setHours(9,0,0,0);
+
         setSelectedSlot({
-          start: new Date(),
-          end: new Date(new Date().getTime() + 60*60*1000),
+          start: defaultStart,
+          end: defaultEnd,
         });
         setOpen(true);
       }}
@@ -185,6 +207,8 @@ export default function TutorCalendar({ allowScheduling = false }) {
             selectable={allowScheduling}
             step={30}
             timeslots={2}
+            min={new Date(0, 0, 0, 8, 0, 0)} // start at 8:00 AM
+            max={new Date(0, 0, 0, 21, 0, 0)} // 9:00 PM
             onSelectEvent={(event) => {
               setSelectedEvent(event);
               setIsEditing(allowScheduling);
@@ -227,6 +251,7 @@ export default function TutorCalendar({ allowScheduling = false }) {
           <DialogContent>
             <Stack spacing={2}>
 
+
               {selectedSlot && (
                 <Box sx={{ mb: 2 }}>
                   <Typography>Start: {selectedSlot.start.toLocaleString()}</Typography>
@@ -234,10 +259,32 @@ export default function TutorCalendar({ allowScheduling = false }) {
                 </Box>
               )}
 
+              <TextField
+                label="Session Date"
+                type="date"
+                fullWidth
+                disabled={!allowScheduling}
+                value={selectedSlot ? selectedSlot.start.toISOString().split("T")[0] : ""}
+                onChange={(e) => {
+                  if (!selectedSlot) return;
+                  const newStart = setDateOnly(selectedSlot.start, e.target.value);
+                  const duration = selectedSlot.end.getTime() - selectedSlot.start.getTime();
+                  setSelectedSlot({
+                    start: newStart,
+                    end: new Date(newStart.getTime() + duration)
+                  });
+                }}
+                slotProps={{ inputLabel: { shrink: true } }}
+                sx={
+                  inputStyle
+                }
+              />
+
+
               <FormControl
                   fullWidth
                   margin="dense"
-                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                  sx={inputStyle}
                 >
                 <InputLabel>Start Time</InputLabel>
                 <Select
@@ -262,7 +309,7 @@ export default function TutorCalendar({ allowScheduling = false }) {
               <FormControl
                   fullWidth
                   margin="dense"
-                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                  sx={inputStyle}
                 >
                 <InputLabel>End Time</InputLabel>
                 <Select
@@ -290,12 +337,12 @@ export default function TutorCalendar({ allowScheduling = false }) {
                 disabled={!allowScheduling}
                   value={title}
                   onChange={(e)=>setTitle(e.target.value)}
-                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                  sx={inputStyle}
                 />
 
               <FormControl
                   fullWidth
-                  sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                  sx={inputStyle}
                 >
                   <InputLabel id="student-label">Student</InputLabel>
                   <Select
@@ -313,7 +360,7 @@ export default function TutorCalendar({ allowScheduling = false }) {
 
               <FormControl
               fullWidth
-              sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+              sx={inputStyle}
             >
               <InputLabel id="tutor-label">Tutor</InputLabel>
               <Select
@@ -336,7 +383,7 @@ export default function TutorCalendar({ allowScheduling = false }) {
                 disabled={!allowScheduling}
                 value={notes}
                 onChange={(e)=>setNotes(e.target.value)}
-                sx={{ backgroundColor: "#e8f0fe", borderRadius: 1 }}
+                sx={inputStyle}
               />
             </Stack>
           </DialogContent>
