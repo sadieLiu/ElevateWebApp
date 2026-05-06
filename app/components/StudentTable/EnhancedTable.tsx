@@ -149,7 +149,18 @@ async function handleAddStudent() {
   // Refresh table
   const res = await fetch("http://127.0.0.1:5000/api/students");
   const updated = await res.json();
-  setRows(updated);
+  setRows(updated.map((student: any) => ({
+    id: student.studentId,
+    userName: student.userName,
+    name: student.name,
+    birthday: student.birthday,
+    grade: student.grade,
+    school: student.school,
+    location: student.location,
+    parentName: student.parentName,
+    parentPhone: student.parentPhone,
+    parentEmail: student.parentEmail,
+  })));
 
   // Close modal + reset fields
   setOpenAddModal(false);
@@ -512,8 +523,8 @@ async function handleAddStudent() {
         <Button
           variant="contained"
           onClick={() => {
-            if (!editingStudent || !editingStudent.studentId) return;   
-            handleUpdateStudent(editingStudent.studentId);
+            if (!editingStudent || !editingStudent.id) return;   
+            handleUpdateStudent(editingStudent.id);
           }}>
           Save
       </Button>

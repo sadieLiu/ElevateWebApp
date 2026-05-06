@@ -166,7 +166,14 @@ async function handleAddTutor() {
   // Refresh table
   const res = await fetch("http://127.0.0.1:5000/api/tutors");
   const updated = await res.json();
-  setRows(updated);
+  setRows(updated.map((tutor:any) => ({
+    id: tutor.tutorId,
+    userName: tutor.userName,
+    name: tutor.name,
+    birthday: tutor.birthday,
+    subjects: tutor.subjects ? tutor.subjects.split(',').join(', ') : "",
+    availability: tutor.availability
+  })));
 
   // Close modal + reset fields
   setOpenAddModal(false);
