@@ -46,16 +46,20 @@ const parseMySQLDate = (value: string) => {
   );
 };
 
-const toLocalInputValue = (date: Date) => {
+/* const toLocalInputValue = (date: Date) => {
   const offset = date.getTimezoneOffset();
   const local = new Date(date.getTime() - offset * 60000);
   return local.toISOString().slice(0, 16);
-};
+}; */
 
 const toMySQLFormat = (date: Date) => {
-  const offset = date.getTimezoneOffset();
-  const local = new Date(date.getTime() - offset * 60000);
-  return local.toISOString().slice(0, 19).replace("T", " ");
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = "00";
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
 const timeOptions = [

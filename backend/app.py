@@ -368,9 +368,12 @@ def get_sessions():
 def add_session():
     data = request.get_json()
 
-    start = datetime.strptime(data['startDateTime'], "%Y-%m-%d %H:%M:%S")
-    end = datetime.strptime(data['endDateTime'], "%Y-%m-%d %H:%M:%S")
-
+    try: 
+        start = datetime.strptime(data['startDateTime'], "%Y-%m-%d %H:%M:%S")
+        end = datetime.strptime(data['endDateTime'], "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return jsonify({"message": "Invalid date format. Use YYYY-MM-DD HH:MM:SS"}), 400
+    
     if start.hour < 8 or end.hour > 20 or (end.hour == 20 and end.minute > 0):
         return jsonify({"message": "Sessions must be between 8 AM and 8 PM"}), 400
 
@@ -380,48 +383,48 @@ def add_session():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-    SELECT * FROM Session
-    WHERE tutorId = %s
-    AND startDateTime < %s
-    AND endDateTime > %s
-    """, (data['tutorId'], data['endDateTime'], data['startDateTime']))
+    try:
+        cursor.execute("""
+        SELECT * FROM Session
+        WHERE tutorId = %s
+        AND startDateTime < %s
+        AND endDateTime > %s
+        """, (data['tutorId'], data['endDateTime'], data['startDateTime']))
 
-    overlap = cursor.fetchone()
+        if cursor.fetchone():
+         return jsonify({"message": "Tutor already has a session during this time"}), 409
 
-    if overlap:
-        cursor.close()
-        conn.close()
-        return jsonify({"message": "Tutor already has a session during this time"}), 409
-
-    cursor.execute("""
-    INSERT INTO Session (tutorId, studentId, subjects, startDateTime, endDateTime, location, notes)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """, (
+        cursor.execute("""
+        INSERT INTO Session (tutorId, studentId, subjects, startDateTime, endDateTime, location, notes)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (
         data['tutorId'],
         data['studentId'],
         data['subjects'],
         data['startDateTime'],
         data['endDateTime'],
         data['location'],
-        data.get('notes', '')
-    ))
-
-    conn.commit()
-    session_id = cursor.lastrowid
-
-    if data.get('studentId'):
-        cursor.execute("""
-        INSERT INTO SessionReport (sessionId, studentId)
-        VALUES (%s, %s)
-        """, (session_id, data['studentId']))
-
+        data.get('notes', '')))
+        
+        session_id = cursor.lastrowid
+        
+        if data.get('studentId'):
+            cursor.execute("""
+            INSERT IGNORE INTO SessionReport (sessionId, studentId)
+            VALUES (%s, %s)
+            """, (session_id, data['studentId']))
+            
         conn.commit()
+        return jsonify({"message": "session added", "sessionId": session_id})
 
-    cursor.close()
-    conn.close()
+    except Exception as e:
+        conn.rollback()
+        print(f"Error adding session: {e}   ")
+        return jsonify({"message": "Error adding session"}), 500
 
-    return jsonify({"message": "session added", "sessionId": session_id})
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route('/api/sessions/<int:id>', methods=['PUT'])
 def update_session(id):
