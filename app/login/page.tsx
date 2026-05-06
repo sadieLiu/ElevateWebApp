@@ -29,10 +29,10 @@ export default function Login() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" sx={{bgcolor: "secondary.main", color: "primary.main", display: "flex", flexDirection: "column", justifyContent: "center", marginTop: "10vh", borderRadius: 2, boxShadow: 3}}>
       <Box
         sx={{
-          mt: 10,
+          mt: 15,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -61,6 +61,12 @@ export default function Login() {
             required
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
+             InputProps={{sx: {color: "white",
+              "& .MuiOutlinedInput-notchedOutline": {borderColor: "primary.main"},
+              "&:hover .MuiOutlinedInput-notchedOutline": {borderColor: "primary.main"},
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {borderColor: "white"}}
+              }}
+            InputLabelProps={{sx:{color: "primary.main", "&.Mui-focused": {color:"primary.main"}}}}
           />
 
           <TextField
@@ -70,12 +76,19 @@ export default function Login() {
             required
             value={passwordHash}
             onChange={(e) => setPassword(e.target.value)}
+            InputProps={{sx: {color: "white",
+              "& .MuiOutlinedInput-notchedOutline": {borderColor: "primary.main"},
+              "&:hover .MuiOutlinedInput-notchedOutline": {borderColor: "primary.main"},
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {borderColor: "white"}}
+              }}
+            InputLabelProps={{sx:{color: "primary.main", "&.Mui-focused": {color:"primary.main"}}}}
           />
 
           <Button
             type="submit" 
             variant="contained"
             size="large"
+            sx={{ mt: 2, bgcolor: "primary.main", color: "secondary.main", "&:hover": { bgcolor: "primary.dark" }, marginBottom:4 }}
           >
             Login
           </Button>
