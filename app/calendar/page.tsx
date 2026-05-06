@@ -395,8 +395,8 @@ export default function TutorCalendar({ allowScheduling = false }) {
             </Stack>
           </DialogContent>
 
-          <DialogActions>
-            <Button onClick={()=>setOpen(false)}>Cancel</Button>
+          <DialogActions sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+            <Button variant="contained" color="primary" onClick={()=>setOpen(false)}>Cancel</Button>
 
             {allowScheduling && (
               <>
