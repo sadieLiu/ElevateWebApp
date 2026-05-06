@@ -1,5 +1,5 @@
 /*This file is the skeleton of our app, what is in here stays on every page*/
-
+import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import StyledRoot  from './styledRoot';
 import Navbar from './components/Navbar';
