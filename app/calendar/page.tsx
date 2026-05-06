@@ -53,13 +53,16 @@ const parseMySQLDate = (value: string) => {
 }; */
 
 const toMySQLFormat = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = "00";
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  const yyyy = date.getFullYear();
+  const mm = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+  const hh = pad(date.getHours());
+  const min = pad(date.getMinutes());
+  const ss = "00";
+
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
 };
 
 const timeOptions = [

@@ -1,16 +1,17 @@
 /* This is the navigation bar component to be used on every page of the app*/
 'use client';
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {Box, AppBar, Toolbar, Typography, Container, Button, List, ListItem, ListItemButton, ListItemText, IconButton} from '@mui/material'
 import SchoolIcon from '@mui/icons-material/School'
 import MenuIcon from '@mui/icons-material/Menu';
 import { useMediaQuery, useTheme, Drawer } from '@mui/material'
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { setUncaughtExceptionCaptureCallback } from 'process';
 
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -104,8 +105,24 @@ const Navbar = () => {
     }
   };
 
-const links = drawerLinks();
 const router = useRouter();
+
+if(isLoading) {
+  return (
+ <AppBar position="static" sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'secondary.main' }}>
+        <Container maxWidth="xl" disableGutters>
+          <Toolbar>
+            <SchoolIcon sx={{color: 'primary.main'}}/>
+            <Typography variant="h5" fontWeight={'bold'} sx={{ flexGrow: 1, color: 'primary.main' }} >
+              ElevateEdu
+            </Typography>
+          </Toolbar>
+        </Container>
+      </AppBar>
+  );
+}
+
+const links = drawerLinks();
 
 const handleClick = (text: string) => {
   if (text == "Logout"){
